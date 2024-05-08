@@ -6,8 +6,10 @@ const {
     token
 } = require('../config');
 
-const starBoard = require('./modules/star-board');
 const client = require('./client');
+
+const starBoard = require('./modules/star-board');
+const pingMods = require('./modules/ping-mods');
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -57,6 +59,9 @@ client.on(Events.MessageDelete, async (message) => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
     try {
+        if (interaction.commandName === 'pingmods') {
+            await pingMods.pingMods(interaction);
+        }
     } catch (e) {
         console.error(e);
     }
