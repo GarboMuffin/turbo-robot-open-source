@@ -9,3 +9,4 @@ config.json
 
 # non-open-source components
 src/modules/big-brother.js
+src/modules/ministry-of-information.js

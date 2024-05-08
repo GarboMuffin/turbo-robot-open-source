@@ -13,7 +13,7 @@ const tryRequire = (path, fallback) => {
         return require(path);
     } catch (e) {
         if (e.code === 'MODULE_NOT_FOUND') {
-            return fallback;
+            return null;
         } else {
             throw e;
         }
@@ -23,9 +23,8 @@ const tryRequire = (path, fallback) => {
 const starBoard = require('./modules/star-board');
 const pingMods = require('./modules/ping-mods');
 const threadPin = require('./modules/thread-pin');
-const bigBrother = tryRequire('./modules/big-brother', {
-    checkThoughtcrime: () => {}
-});
+const bigBrother = tryRequire('./modules/big-brother');
+const ministryOfInformation = tryRequire('./modules/ministry-of-information');
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -45,7 +44,8 @@ client.on(Events.MessageCreate, async (message) => {
             return;
         }
 
-        await bigBrother.checkThoughtcrime(message);
+        if (ministryOfInformation) ministryOfInformation.onNewMessage(message);
+        if (bigBrother) await bigBrother.checkThoughtcrime(message);
     } catch (e) {
         console.error(e);
     }
@@ -61,7 +61,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             return;
         }
 
-        await bigBrother.checkThoughtcrime(message);
+        if (ministryOfInformation) ministryOfInformation.onNewMessage(newMessage);
+        await bigBrother.checkThoughtcrime(newMessage);
         await starBoard.onEditMessage(newMessage);
     } catch (e) {
         console.error(e);
@@ -70,6 +71,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
 client.on(Events.MessageDelete, async (message) => {
     try {
+        if (ministryOfInformation) ministryOfInformation.onDeleteMessage(message);
         await starBoard.onDeleteMessage(message);
     } catch (e) {
         console.error(e);
