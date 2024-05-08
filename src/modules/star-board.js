@@ -1,7 +1,7 @@
 const {PermissionsBitField} = require('discord.js');
 const client = require('../client');
 const db = require('../db');
-const config = require('../../config.json');
+const config = require('../../config');
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS starboard (

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # it is recommended production database be stored on an encrypted volume
-# then set config.json's dataPath to /encrypted/discord/
 
 set -euf -o pipefail
 
@@ -12,6 +11,7 @@ set -euf -o pipefail
 # cryptsetup luksOpen /root/encrypted-storage encrypted-storage
 # mkfs.ext4 /dev/mapper/encrypted-storage
 # cryptsetup luksClose encrypted-storage
+# then set config.js's dataPath to /encrypted/discord/
 
 # mount with:
 cryptsetup luksOpen /root/encrypted-storage encrypted-storage

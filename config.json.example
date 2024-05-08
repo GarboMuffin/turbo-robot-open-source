@@ -1,8 +1,0 @@
-{
-    "applicationId": "from https://discord.com/developers/applications",
-    "token": "from https://discord.com/developers/applications",
-    "modRoleId": "right click on the role > copy id",
-    "modChannelId": "right click on the channel > copy id",
-    "starboardChannelId": "right click on the channel > copy id",
-    "dataPath": ""
-}

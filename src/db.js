@@ -1,7 +1,7 @@
 const fs = require('fs');
 const pathUtil = require('path');
 const sqlite3 = require('better-sqlite3');
-const config = require('../config.json');
+const config = require('../config');
 
 const resolvedDataDirectory = pathUtil.resolve(__dirname, '..', config.dataPath);
 if (!fs.existsSync(resolvedDataDirectory)) {

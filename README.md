@@ -14,7 +14,7 @@ Some other Scratch-related servers have very large bots with a lot of interactiv
 
 ## How to run it
 
-Copy `config.json.example` as `config.json` and replace the fields appropriately. `config.json` is part of `.gitignore` so it will not be committed.
+Copy `config.example.js` as `config.js` and replace the fields appropriately. `config.js` is part of `.gitignore` so it will not be committed.
 
 Install dependencies:
 

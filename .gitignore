@@ -2,7 +2,7 @@ node_modules
 .DS_Store
 
 # secret config strings
-config.json
+config.js
 
 # database files
 *.db*
