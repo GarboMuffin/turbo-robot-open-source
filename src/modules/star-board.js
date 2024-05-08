@@ -24,7 +24,7 @@ const _setStarboardMessageId = db.prepare('UPDATE starboard SET starboard_messag
 const _setCount = db.prepare('UPDATE starboard SET count = ? WHERE original_message_id = ?');
 
 const EMOJI = '🍡';
-const THRESHOLD = 1;
+const THRESHOLD = 7;
 const COLORS = [
     0xfcb1e3,
     0xfed983,
