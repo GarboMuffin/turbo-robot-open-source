@@ -1,0 +1,8 @@
+node_modules
+.DS_Store
+
+# secret config strings
+config.json
+
+# database files
+*.db*
