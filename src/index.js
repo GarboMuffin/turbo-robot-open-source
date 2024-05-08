@@ -10,6 +10,7 @@ const client = require('./client');
 
 const starBoard = require('./modules/star-board');
 const pingMods = require('./modules/ping-mods');
+const threadPin = require('./modules/thread-pin');
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -61,6 +62,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
     try {
         if (interaction.commandName === 'pingmods') {
             await pingMods.pingMods(interaction);
+        }
+
+        if (interaction.commandName === 'Thread owner: Pin') {
+            await threadPin.pin(interaction);
+        }
+
+        if (interaction.commandName === 'Thread owner: Unpin') {
+            await threadPin.unpin(interaction);
         }
     } catch (e) {
         console.error(e);
