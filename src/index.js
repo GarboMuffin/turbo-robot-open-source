@@ -8,7 +8,7 @@ const {
 
 const client = require('./client');
 
-const tryRequire = (path, fallback) => {
+const tryRequire = (path) => {
     try {
         return require(path);
     } catch (e) {
