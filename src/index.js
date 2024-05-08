@@ -8,9 +8,24 @@ const {
 
 const client = require('./client');
 
+const tryRequire = (path, fallback) => {
+    try {
+        return require(path);
+    } catch (e) {
+        if (e.code === 'MODULE_NOT_FOUND') {
+            return fallback;
+        } else {
+            throw e;
+        }
+    }
+};
+
 const starBoard = require('./modules/star-board');
 const pingMods = require('./modules/ping-mods');
 const threadPin = require('./modules/thread-pin');
+const bigBrother = tryRequire('./modules/big-brother', {
+    checkThoughtcrime: () => {}
+});
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -29,6 +44,8 @@ client.on(Events.MessageCreate, async (message) => {
         if (message.author.id === client.user.id) {
             return;
         }
+
+        await bigBrother.checkThoughtcrime(message);
     } catch (e) {
         console.error(e);
     }
@@ -44,6 +61,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             return;
         }
 
+        await bigBrother.checkThoughtcrime(message);
         await starBoard.onEditMessage(newMessage);
     } catch (e) {
         console.error(e);
