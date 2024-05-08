@@ -62,7 +62,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         }
 
         if (ministryOfInformation) ministryOfInformation.onNewMessage(newMessage);
-        await bigBrother.checkThoughtcrime(newMessage);
+        if (bigBrother) await bigBrother.checkThoughtcrime(newMessage);
         await starBoard.onEditMessage(newMessage);
     } catch (e) {
         console.error(e);
