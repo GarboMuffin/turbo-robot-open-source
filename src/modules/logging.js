@@ -1,0 +1,196 @@
+const {
+  AttachmentBuilder,
+  AuditLogEvent
+} = require('discord.js');
+const { unifiedDiff } = require('difflib');
+const client = require('../client');
+const config = require('../../config');
+
+const editedMessage = async (oldMessage, newMessage) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  const diff = !oldMessage.partial && unifiedDiff(
+    oldMessage.content.split('\n'),
+    newMessage.content.split('\n'),
+    { lineterm: '' }
+  )
+  .join('\n')
+  .replace(/^-{3} \n\+{3} \n/, '');
+
+  let log = {
+    allowedMentions: { parse: [] }
+  };
+  if (!oldMessage.partial && oldMessage.pinned !== newMessage.pinned) {
+    log.content = `📌 [Message](${newMessage.url}) by <@${newMessage.author.id}> was ${newMessage.pinned ? '' : 'un'}pinned in ${newMessage.channel.url}`;
+  } else if (oldMessage.flags.has('SuppressEmbeds') !== newMessage.flags.has('SuppressEmbeds')) {
+    log.content = `📝 Embeds ${newMessage.flags.has('SuppressEmbeds') ? 'removed from' : 'shown on'} [message](${newMessage.url}) by <@${newMessage.author.id}> in ${newMessage.channel.url}`;
+    log.embeds = oldMessage.embeds;
+  } else {
+    log.content = `📝 [${oldMessage.partial ? 'Unknown message' : 'Message'}](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url}`;
+    if (oldMessage.attachments !== newMessage.attachments) {
+      log.files = oldMessage.attachments.map(attachment => ({
+        name: attachment.name,
+        attachment: attachment.url
+      }));
+    }
+    if (!oldMessage.partial) {
+      if (diff.length <= 250) {
+      log.content += `\n\`\`\`${diff ? `diff\n${diff}` : '\n[No Content]'}\n\`\`\``;
+      } else {
+        log.files = log.files.concat([
+          new AttachmentBuilder(
+            Buffer.from(diff),
+            { name: 'message.diff' }
+          )
+        ]);
+      }
+    }
+  }
+
+  await logChannel.send(log);
+};
+
+const deletedMessage = async (message) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  let log = {
+    content: `🗑 [Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
+    allowedMentions: { parse: [] }
+  };
+  if (message.attachments) {
+    log.files = message.attachments.map(attachment => ({
+      name: attachment.name,
+      attachment: attachment.url
+    }));
+  }
+  if (!message.partial) {
+    if (message.content.length <= 250) {
+      log.content += `\n\`\`\`\n${message.content}\n\`\`\``;
+    } else {
+      log.files = log.files.concat([
+        new AttachmentBuilder(
+          Buffer.from(message.content),
+          { name: 'message.txt' }
+        )
+      ]);
+    }
+  }
+
+  await logChannel.send(log);
+};
+
+const purgedMessages = async (messages, channelUrl) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  let deletedMessages = '';
+  messages.reverse().forEach(message => {
+    deletedMessages += `${message.author.tag} said:\n${message.content || '[No Content]'}\n\n`;
+  });
+
+  let log = {
+    content: `🗑 \`/purge\` was used in ${channelUrl}`,
+    allowedMentions: { parse: [] }
+  };
+  if (deletedMessages.length <= 250) {
+    log.content += `\n\`\`\`\n${deletedMessages}\n\`\`\``;
+  } else {
+    log.files = [
+      new AttachmentBuilder(
+        Buffer.from(deletedMessages),
+        { name: 'message.txt' }
+      )
+    ];
+  }
+
+  await logChannel.send(log);
+}
+
+const voiceChat = async (oldState, newState) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  let log = {
+    allowedMentions: { parse: [] }
+  };
+  if (oldState.channelId !== newState.channelId) {
+    if (oldState.channelId) {
+      log.content = (`🔊 <@${oldState.member.user.id}> left voice channel <#${oldState.channel.id}>`);
+    }
+    if (newState.channelId) {
+      log.content = (`🔊 <@${newState.member.user.id}> joined voice channel <#${newState.channel.id}>`);
+    }
+  }
+  if (oldState.streaming !== newState.streaming) {
+    if (newState.streaming) {
+      log.content = (`🖥 <@${newState.member.user.id}> started screensharing in <#${newState.channel.id}>`);
+    } else {
+      log.content = (`🖥 <@${newState.member.user.id}> stopped screensharing in <#${newState.channel.id}>`);
+    }
+  }
+
+  await logChannel.send(log);
+}
+
+const userJoin = async (member) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  await logChannel.send({
+    content: `👤 <@${member.user.id}> joined the server`,
+    allowedMentions: { parse: [] }
+  });
+};
+
+const userLeave = async (member) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  await logChannel.send({
+    content: `👤 <@${member.user.id}> left the server`,
+    allowedMentions: { parse: [] }
+  });
+};
+
+const auditLogs = async (auditLog) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+
+  let log = {
+    allowedMentions: { parse: [] }
+  };
+  switch (auditLog.action) {
+    case AuditLogEvent.MemberBanAdd:
+      log.content = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      break;
+    case AuditLogEvent.MemberBanRemove:
+      log.content = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
+      break;
+    case AuditLogEvent.MemberKick:
+      log.content = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      break;
+    case AuditLogEvent.InviteCreate:
+      log.content = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
+        auditLog.target.maxUses === 0 ? 'no limit' : `${auditLog.target.maxUses} max use(s)`} and ${
+        auditLog.target.maxAge === 0 ? 'no expiration' : `expires in ${
+          auditLog.target.maxAge < 86400 ? `${
+            auditLog.target.maxAge < 3600 ? `${
+              auditLog.target.maxAge / 60} minute(s)` : `${
+            auditLog.target.maxAge / 3600} hour(s)`}` : `${
+          auditLog.target.maxAge / 86400} day(s)`}`
+        }`;
+      break;
+    case AuditLogEvent.InviteDelete:
+      log.content = `🔗 <@${auditLog.executorId}> deleted an invite \`${auditLog.target.code}\``;
+      break;
+  }
+
+  if (log.content) {
+    await logChannel.send(log);
+  }
+};
+
+module.exports = {
+  editedMessage,
+  deletedMessage,
+  purgedMessages,
+  voiceChat,
+  userJoin,
+  userLeave,
+  auditLogs
+};
