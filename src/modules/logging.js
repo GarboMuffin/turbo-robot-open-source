@@ -24,23 +24,25 @@ const editedMessage = async (oldMessage, newMessage) => {
     log.content = `📌 [Message](${newMessage.url}) by <@${newMessage.author.id}> was ${newMessage.pinned ? '' : 'un'}pinned in ${newMessage.channel.url}`;
   } else if (oldMessage.flags.has('SuppressEmbeds') !== newMessage.flags.has('SuppressEmbeds')) {
     log.content = `📝 Embeds ${newMessage.flags.has('SuppressEmbeds') ? 'removed from' : 'shown on'} [message](${newMessage.url}) by <@${newMessage.author.id}> in ${newMessage.channel.url}`;
-		log.embeds = oldMessage.embeds;
+    log.embeds = oldMessage.embeds;
   } else {
     log.content = `📝 [${oldMessage.partial ? 'Unknown message' : 'Message'}](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url}`;
-    log.files = oldMessage.attachments.map(attachment => ({
-      name: attachment.name,
-      attachment: attachment.url
-    }));
+    if (oldMessage.attachments !== newMessage.attachments) {
+      log.files = oldMessage.attachments.map(attachment => ({
+        name: attachment.name,
+        attachment: attachment.url
+      }));
+    }
     if (!oldMessage.partial) {
       if (diff.length <= 250) {
       log.content += `\n\`\`\`${diff ? `diff\n${diff}` : '\n[No Content]'}\n\`\`\``;
       } else {
-        log.files = [
+        log.files = log.files.concat([
           new AttachmentBuilder(
             Buffer.from(diff),
             { name: 'message.diff' }
           )
-        ];
+        ]);
       }
     }
   }
