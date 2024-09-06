@@ -21,8 +21,10 @@ const tryRequire = (path) => {
 };
 
 const starBoard = require('./modules/star-board');
-const pingMods = require('./modules/ping-mods');
-const threadPin = require('./modules/thread-pin');
+const contactMods = require('./modules/contact-mods');
+const purgeMessages = require('./modules/purge-messages');
+const thread = require('./modules/thread');
+const logging = require('./modules/logging');
 const bigBrother = tryRequire('./modules/big-brother');
 const ministryOfInformation = tryRequire('./modules/ministry-of-information');
 
@@ -30,8 +32,12 @@ client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
     client.user.setActivity({
         type: ActivityType.Watching,
-        name: 'for /pingmods'
+        name: 'for thought crime committers'
     });
+});
+
+client.on(Events.ClientReady, (client) => {
+    setInterval(contactMods.ticketActivity, 30000);
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -63,6 +69,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
         if (ministryOfInformation) ministryOfInformation.onNewMessage(newMessage);
         if (bigBrother) await bigBrother.checkThoughtcrime(newMessage);
+        await logging.editedMessage(oldMessage, newMessage);
         await starBoard.onEditMessage(newMessage);
     } catch (e) {
         console.error(e);
@@ -72,24 +79,41 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 client.on(Events.MessageDelete, async (message) => {
     try {
         if (ministryOfInformation) ministryOfInformation.onDeleteMessage(message);
+        await logging.deletedMessage(message);
         await starBoard.onDeleteMessage(message);
     } catch (e) {
         console.error(e);
     }
 });
 
+client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+    await logging.voiceChat(oldState, newState);
+});
+
 client.on(Events.InteractionCreate, async (interaction) => {
     try {
-        if (interaction.commandName === 'pingmods') {
-            await pingMods.pingMods(interaction);
-        }
-
-        if (interaction.commandName === 'Thread owner: Pin') {
-            await threadPin.pin(interaction);
-        }
-
-        if (interaction.commandName === 'Thread owner: Unpin') {
-            await threadPin.unpin(interaction);
+        switch (interaction.commandName) {
+            case 'contactmods':
+                await contactMods.contactMods(interaction);
+                break;
+            case 'purge':
+                await purgeMessages.purgeMessages(interaction);
+                break;
+            case 'closethread':
+                await thread.close(interaction);
+                break;
+            case 'Report User':
+                await contactMods.reportUser(interaction);
+                break;
+            case 'Report Message':
+                await contactMods.reportMessage(interaction);
+                break;
+            case 'Thread owner: Pin':
+                await thread.pin(interaction);
+                break;
+            case 'Thread owner: Unpin':
+                await thread.unpin(interaction);
+                break;
         }
     } catch (e) {
         console.error(e);
@@ -102,6 +126,18 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     } catch (e) {
         console.error(e);
     }
+});
+
+client.on(Events.GuildMemberAdd, async (member) => {
+    await logging.userJoin(member);
+});
+
+client.on(Events.GuildMemberRemove, async (member) => {
+    await logging.userLeave(member);
+});
+
+client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
+    await logging.auditLogs(auditLog);
 });
 
 client.login(token);

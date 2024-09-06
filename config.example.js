@@ -13,9 +13,17 @@ module.exports = {
     // copy and paste its ID here as a string.
     modRoleId: 'right click on the role > copy id',
 
-    // Create a channel for mod stuff (its where /pingmods goes), then
+    // Create a channel for mod stuff, then
     // copy and paste its ID here as a string.
     modChannelId: 'right click on the channel > copy id',
+
+    // Create a channel for logging, then
+    // copy and paste its ID here as a string.
+    logChannelId: 'right click on the channel > copy id',
+
+    // Create a channel for the mod contact system, then
+    // copy and paste its ID here as a string.
+    contactChannelId: 'right click on the channel > copy id',
 
     // Create a channel for the starboard, then
     // copy and paste its ID here as a string.
