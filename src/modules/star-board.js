@@ -1,4 +1,4 @@
-const {PermissionsBitField} = require('discord.js');
+const {PermissionsBitField, MessageType} = require('discord.js');
 const client = require('../client');
 const db = require('../db');
 const config = require('../../config');
@@ -55,11 +55,36 @@ const isPublicChannel = (channel) => {
     ].every(i => permissions.has(i));
 };
 
+/**
+ * @param {import('discord.js').Message} message
+ * @returns {string|null}
+ */
+const stringifyMessageContent = (message) => {
+    if (message.system) {
+        switch (message.type) {
+            case MessageType.UserJoin:
+                return 'Join the server';
+            case MessageType.GuildBoost:
+                return 'Boosted the server';
+            case MessageType.PollResult:
+                return 'Poll ended';
+            default:
+                return `!!!!! Unknown message type ${message.type} !!!!!`;
+        }
+    }
+
+    return message.content;
+};
+
+/**
+ * @param {import('discord.js').Message} message
+ */
 const updateMessage = async (message) => {
     await message.fetch();
     const starboardChannel = await client.channels.fetch(config.starboardChannelId);
 
     const startingMessage = _getMessage.get(message.id);
+    const messageContent = stringifyMessageContent(message);
     const embedMessage = {
         allowedMentions: {},
         content: `${EMOJI} **${startingMessage.count}** - ${message.url}`,
@@ -71,7 +96,7 @@ const updateMessage = async (message) => {
                     url: message.url,
                     icon_url: message.author.displayAvatarURL()
                 },
-                ...(message.content ? { description: message.content } : {}),
+                ...(messageContent ? { description: messageContent } : {}),
                 timestamp: new Date(message.createdTimestamp).toISOString()
             }
         ]
