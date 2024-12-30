@@ -118,13 +118,26 @@ const voiceChat = async (oldState, newState) => {
     if (newState.channelId) {
       log.content = (`🔊 <@${newState.member.user.id}> joined voice channel <#${newState.channel.id}>`);
     }
-  }
-  if (oldState.streaming !== newState.streaming) {
+  } else if (oldState.streaming !== newState.streaming) {
     if (newState.streaming) {
       log.content = (`🖥 <@${newState.member.user.id}> started screensharing in <#${newState.channel.id}>`);
     } else {
       log.content = (`🖥 <@${newState.member.user.id}> stopped screensharing in <#${newState.channel.id}>`);
     }
+  } else if (oldState.selfMute !== newState.selfMute) {
+    if (newState.selfMute) {
+      log.content = (`🎙 <@${newState.member.user.id}> turned off microphone in <#${newState.channel.id}>`);
+    } else {
+      log.content = (`🎙 <@${newState.member.user.id}> turned on microphone in <#${newState.channel.id}>`);
+    }
+  } else if (oldState.selfDeaf !== newState.selfDeaf) {
+    if (newState.selfDeaf) {
+      log.content = (`🎧 <@${newState.member.user.id}> deafened in <#${newState.channel.id}>`);
+    } else {
+      log.content = (`🎧 <@${newState.member.user.id}> un-deafened in <#${newState.channel.id}>`);
+    }
+  } else {
+    return;
   }
 
   await logChannel.send(log);
