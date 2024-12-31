@@ -5,7 +5,9 @@ const purgeMessages = async (interaction) => {
 
   interaction.channel.messages.fetch({ limit: amount })
   .then(messages => {
-    purgedMessages(messages, interaction.channel.url);
+    if (!(messages.size === 1)) {
+      purgedMessages(messages, interaction.channel.url);
+    }
     interaction.channel.bulkDelete(messages);
     interaction.reply({
       content: `Deleted ${Array.from(messages).length} messages.`,
