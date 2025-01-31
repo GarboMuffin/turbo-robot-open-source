@@ -32,7 +32,7 @@ client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
     client.user.setActivity({
         type: ActivityType.Watching,
-        name: 'for thought crime committers'
+        name: 'for thoughtcrime committers'
     });
 });
 
