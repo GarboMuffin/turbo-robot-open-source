@@ -40,6 +40,8 @@ const isPublicChannel = (channel) => {
         // mod channels; they should already be excluded by below checks but just to be safe...
         '1046570476417323049',
         '1150269777370165310',
+        // log channel ID required
+        // contact mods channel ID required
     ];
     if (DISABLED_CHANNELS.includes(channel.id)) {
         return false;
