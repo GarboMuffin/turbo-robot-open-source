@@ -14,7 +14,7 @@ const {
 const commands = [
     new SlashCommandBuilder()
         .setName('contactmods')
-        .setDescription('Contact moderators without posting a public message')
+        .setDescription('Contact moderators without posting a public message (previously /pingmods)')
         .addStringOption(option => option
             .setName('topic')
             .setDescription('What are you contacting us about?')
