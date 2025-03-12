@@ -26,7 +26,6 @@ const purgeMessages = require('./modules/purge-messages');
 const thread = require('./modules/thread');
 const logging = require('./modules/logging');
 const bigBrother = tryRequire('./modules/big-brother');
-const ministryOfInformation = tryRequire('./modules/ministry-of-information');
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -50,7 +49,6 @@ client.on(Events.MessageCreate, async (message) => {
             return;
         }
 
-        if (ministryOfInformation) ministryOfInformation.onNewMessage(message);
         if (bigBrother) await bigBrother.checkThoughtcrime(message);
     } catch (e) {
         console.error(e);
@@ -67,7 +65,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             return;
         }
 
-        if (ministryOfInformation) ministryOfInformation.onNewMessage(newMessage);
         if (bigBrother) await bigBrother.checkThoughtcrime(newMessage);
         await logging.editedMessage(oldMessage, newMessage);
         await starBoard.onEditMessage(newMessage);
@@ -78,7 +75,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
 client.on(Events.MessageDelete, async (message) => {
     try {
-        if (ministryOfInformation) ministryOfInformation.onDeleteMessage(message);
         await logging.deletedMessage(message);
         await starBoard.onDeleteMessage(message);
     } catch (e) {
