@@ -12,7 +12,10 @@ const editedMessage = async (oldMessage, newMessage) => {
   if (
     newMessage.channel.id === config.modChannelId ||
     newMessage.channel.id === config.logChannelId ||
-    newMessage.channel.id === config.starboardChannelId
+    newMessage.channel.id === config.starboardChannelId ||
+    oldMessage.partial ||
+    !(oldMessage.content && oldMessage.attachments) ||
+    oldMessage.author.bot
   ) {
     return;
   }
