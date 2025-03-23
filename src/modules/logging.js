@@ -56,14 +56,6 @@ const editedMessage = async (oldMessage, newMessage) => {
     }
   }
 
-  if (
-    oldMessage.partial ||
-    !(oldMessage.content && oldMessage.attachments) ||
-    oldMessage.author.bot
-  ) {
-    return;
-  }
-
   await logChannel.send(log);
 };
 
