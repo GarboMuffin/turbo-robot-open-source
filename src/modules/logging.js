@@ -9,7 +9,15 @@ const config = require('../../config');
 const editedMessage = async (oldMessage, newMessage) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
-  const diff = !oldMessage.partial && unifiedDiff(
+  if (
+    newMessage.channel.id === config.modChannelId ||
+    newMessage.channel.id === config.logChannelId ||
+    newMessage.channel.id === config.starboardChannelId
+  ) {
+    return;
+  }
+
+  const diff = unifiedDiff(
     oldMessage.content.split('\n'),
     newMessage.content.split('\n'),
     { lineterm: '' }
@@ -20,31 +28,37 @@ const editedMessage = async (oldMessage, newMessage) => {
   let log = {
     allowedMentions: { parse: [] }
   };
-  if (!oldMessage.partial && oldMessage.pinned !== newMessage.pinned) {
+  if (oldMessage.pinned !== newMessage.pinned) {
     log.content = `📌 [Message](${newMessage.url}) by <@${newMessage.author.id}> was ${newMessage.pinned ? '' : 'un'}pinned in ${newMessage.channel.url}`;
   } else if (oldMessage.flags.has('SuppressEmbeds') !== newMessage.flags.has('SuppressEmbeds')) {
     log.content = `📝 Embeds ${newMessage.flags.has('SuppressEmbeds') ? 'removed from' : 'shown on'} [message](${newMessage.url}) by <@${newMessage.author.id}> in ${newMessage.channel.url}`;
     log.embeds = oldMessage.embeds;
   } else {
-    log.content = `📝 [${oldMessage.partial ? 'Unknown message' : 'Message'}](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url}`;
+    log.content = `📝 [Message](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url}`;
     if (oldMessage.attachments !== newMessage.attachments) {
       log.files = oldMessage.attachments.map(attachment => ({
         name: attachment.name,
         attachment: attachment.url
       }));
     }
-    if (!oldMessage.partial) {
-      if (diff.length <= 250) {
+    if (diff.length <= 250) {
       log.content += `\n\`\`\`${diff ? `diff\n${diff}` : '\n[No Content]'}\n\`\`\``;
-      } else {
-        log.files = log.files.concat([
-          new AttachmentBuilder(
-            Buffer.from(diff),
-            { name: 'message.diff' }
-          )
-        ]);
-      }
+    } else {
+      log.files = log.files.concat([
+        new AttachmentBuilder(
+          Buffer.from(diff),
+          { name: 'message.diff' }
+        )
+      ]);
     }
+  }
+
+  if (
+    oldMessage.partial ||
+    !(oldMessage.content && oldMessage.attachments) ||
+    oldMessage.author.bot
+  ) {
+    return;
   }
 
   await logChannel.send(log);
@@ -52,6 +66,14 @@ const editedMessage = async (oldMessage, newMessage) => {
 
 const deletedMessage = async (message) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
+
+  if (
+    message.channel.id === config.modChannelId ||
+    message.channel.id === config.logChannelId ||
+    message.channel.id === config.starboardChannelId
+  ) {
+    return;
+  }
 
   let log = {
     content: `🗑 [Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
