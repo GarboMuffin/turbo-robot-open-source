@@ -64,7 +64,7 @@ const contactMods = async (interaction) => {
           })
           .addFields({
             name: 'Recent Context:',
-            value: `${mostRecentMessage.url}`
+            value: mostRecentMessage ? `${mostRecentMessage.url}` : 'None :('
           })
       ]
     });
@@ -92,7 +92,7 @@ const contactMods = async (interaction) => {
           })
           .addFields({
             name: 'Recent Context:',
-            value: `${mostRecentMessage.url}`
+            value: mostRecentMessage ? `${mostRecentMessage.url}` : 'None :('
           })
       ]
     });
