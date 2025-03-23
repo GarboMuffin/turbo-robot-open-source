@@ -36,6 +36,11 @@ const contactMods = async (interaction) => {
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
   const contactChannel = await client.channels.fetch(config.contactChannelId);
 
+  const recentMessages = await interaction.channel.messages.fetch({
+    limit: 1
+  });
+  const mostRecentMessage = recentMessages.first();
+
   const username = interaction.member.nickname ?? interaction.user.displayName;
   if (!doesTicketExist(await contactChannel.threads.fetchActive(), interaction.user.id)) {
     const thread = await contactChannel.threads.create({
@@ -56,6 +61,10 @@ const contactMods = async (interaction) => {
           .addFields({
             name: 'Reason for contacting:',
             value: `${reason}`
+          })
+          .addFields({
+            name: 'Recent Context:',
+            value: `${mostRecentMessage.url}`
           })
       ]
     });
@@ -80,6 +89,10 @@ const contactMods = async (interaction) => {
           .addFields({
             name: 'Reason for contacting:',
             value: `${reason}`
+          })
+          .addFields({
+            name: 'Recent Context:',
+            value: `${mostRecentMessage.url}`
           })
       ]
     });
