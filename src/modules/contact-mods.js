@@ -23,7 +23,7 @@ const ticketActivity = async () => {
     const inactiveDuration = currentTime - lastActivityTimestamp;
 
     if (inactiveDuration >= 86400000) {
-      await thread.send('Ticket auto closed due to no activity in 24 hours.');
+      await thread.send('Ticket auto-closed due to no activity for 24 hours.');
       await thread.setLocked(true);
       await thread.setArchived(true);
     }
@@ -31,6 +31,7 @@ const ticketActivity = async () => {
 };
 
 const contactMods = async (interaction) => {
+  await interaction.deferReply()
   const topic = interaction.options.getString('topic');
   const reason = interaction.options.getString('information');
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
@@ -70,7 +71,7 @@ const contactMods = async (interaction) => {
     });
     thread.members.add(interaction.user.id);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Ticket created successfully! ${thread.url}`,
       ephemeral: true
     });
@@ -97,7 +98,7 @@ const contactMods = async (interaction) => {
       ]
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Ticket updated successfully! ${thread.url}`,
       ephemeral: true
     });
@@ -133,7 +134,7 @@ const reportMessage = async (interaction) => {
     });
     thread.members.add(interaction.user.id);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Reported message successfully! ${thread.url}`,
       ephemeral: true
     });
@@ -156,7 +157,7 @@ const reportMessage = async (interaction) => {
       ]
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Reported message successfully! ${thread.url}`,
       ephemeral: true
     });
@@ -192,7 +193,7 @@ const reportUser = async (interaction) => {
     });
     thread.members.add(interaction.user.id);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Reported user successfully! ${thread.url}`,
       ephemeral: true
     });
@@ -215,7 +216,7 @@ const reportUser = async (interaction) => {
       ]
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Reported user successfully! ${thread.url}`,
       ephemeral: true
     });
