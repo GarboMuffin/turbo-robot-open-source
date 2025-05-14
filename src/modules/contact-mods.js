@@ -31,7 +31,7 @@ const ticketActivity = async () => {
 };
 
 const contactMods = async (interaction) => {
-  await interaction.deferReply()
+  await interaction.deferReply();
   const topic = interaction.options.getString('topic');
   const reason = interaction.options.getString('information');
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
