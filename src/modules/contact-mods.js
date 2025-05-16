@@ -31,7 +31,10 @@ const ticketActivity = async () => {
 };
 
 const contactMods = async (interaction) => {
-  await interaction.deferReply();
+  await interaction.deferReply({
+    ephemeral: true
+  });
+
   const topic = interaction.options.getString('topic');
   const reason = interaction.options.getString('information');
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
@@ -72,8 +75,7 @@ const contactMods = async (interaction) => {
     thread.members.add(interaction.user.id);
 
     await interaction.editReply({
-      content: `Ticket created successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Ticket created successfully! ${thread.url}`
     });
   } else {
     const thread = findTicket(await contactChannel.threads.fetchActive(), interaction.user.id);
@@ -99,13 +101,16 @@ const contactMods = async (interaction) => {
     });
 
     await interaction.editReply({
-      content: `Ticket updated successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Ticket updated successfully! ${thread.url}`
     });
   }
 };
 
 const reportMessage = async (interaction) => {
+  await interaction.deferReply({
+    ephemeral: true
+  });
+
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
   const contactChannel = await client.channels.fetch(config.contactChannelId);
 
@@ -135,8 +140,7 @@ const reportMessage = async (interaction) => {
     thread.members.add(interaction.user.id);
 
     await interaction.editReply({
-      content: `Reported message successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Reported message successfully! ${thread.url}`
     });
   } else {
     const thread = findTicket(await contactChannel.threads.fetchActive(), interaction.user.id);
@@ -158,13 +162,16 @@ const reportMessage = async (interaction) => {
     });
 
     await interaction.editReply({
-      content: `Reported message successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Reported message successfully! ${thread.url}`
     });
   }
 };
 
 const reportUser = async (interaction) => {
+  await interaction.deferReply({
+    ephemeral: true
+  });
+
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
   const contactChannel = await client.channels.fetch(config.contactChannelId);
 
@@ -194,8 +201,7 @@ const reportUser = async (interaction) => {
     thread.members.add(interaction.user.id);
 
     await interaction.editReply({
-      content: `Reported user successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Reported user successfully! ${thread.url}`
     });
   } else {
     const thread = findTicket(await contactChannel.threads.fetchActive(), interaction.user.id);
@@ -217,8 +223,7 @@ const reportUser = async (interaction) => {
     });
 
     await interaction.editReply({
-      content: `Reported user successfully! ${thread.url}`,
-      ephemeral: true
+      content: `Reported user successfully! ${thread.url}`
     });
   }
 };
