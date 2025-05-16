@@ -5,9 +5,9 @@
     "main": "src/index.js",
     "license": "Apache-2.0",
     "dependencies": {
-        "better-sqlite3": "^11.6.0",
+        "better-sqlite3": "^11.10.0",
         "difflib": "^0.2.4",
-        "discord.js": "^14.18.0"
+        "discord.js": "^14.19.3"
     },
     "private": true
 }
