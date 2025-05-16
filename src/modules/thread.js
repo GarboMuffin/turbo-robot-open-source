@@ -1,10 +1,11 @@
+const {MessageFlags} = require('discord.js');
 const config = require('../../config');
 
 const checkPreconditions = async (interaction) => {
     if (!interaction.channel) {
         await interaction.reply({
             content: 'Not in a channel?',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
         return false;
     }
@@ -13,7 +14,7 @@ const checkPreconditions = async (interaction) => {
     if (!interaction.channel.isThread()) {
         await interaction.reply({
             content: 'You are not in a thread',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
         return false;
     }
@@ -24,7 +25,7 @@ const checkPreconditions = async (interaction) => {
     ) {
         await interaction.reply({
             content: 'You do not own this thread',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
         return false;
     }
@@ -36,7 +37,7 @@ const close = async (interaction) => {
     if (!await checkPreconditions(interaction)) return;
     await interaction.reply({
         content: 'Thread has been closed.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
     });
     await interaction.channel.setLocked(true);
     await interaction.channel.setArchived(true);
@@ -49,12 +50,12 @@ const pin = async (interaction) => {
         await interaction.targetMessage.pin('bot interaction');
         await interaction.reply({
             content: 'Message pinned!',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
     } else {
         await interaction.reply({
             content: 'Message is already pinned!',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
     }
 };
@@ -66,12 +67,12 @@ const unpin = async (interaction) => {
         await interaction.targetMessage.unpin('bot interaction');
         await interaction.reply({
             content: 'Message unpinned!',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
     } else {
         await interaction.reply({
             content: 'Message is not pinned!',
-            ephemeral: true
+            flags: MessageFlags.Ephemeral
         });
     }
 };

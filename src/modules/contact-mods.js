@@ -1,6 +1,7 @@
 const {
   ChannelType,
-  EmbedBuilder
+  EmbedBuilder,
+  MessageFlags
 } = require('discord.js');
 const client = require('../client');
 const config = require('../../config');
@@ -32,7 +33,7 @@ const ticketActivity = async () => {
 
 const contactMods = async (interaction) => {
   await interaction.deferReply({
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 
   const topic = interaction.options.getString('topic');
@@ -108,7 +109,7 @@ const contactMods = async (interaction) => {
 
 const reportMessage = async (interaction) => {
   await interaction.deferReply({
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);
@@ -169,7 +170,7 @@ const reportMessage = async (interaction) => {
 
 const reportUser = async (interaction) => {
   await interaction.deferReply({
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 
   const modRole = await interaction.guild.roles.fetch(config.modRoleId);

@@ -1,3 +1,4 @@
+const { MessageFlags } = require('discord.js');
 const { purgedMessages } = require('./logging');
 
 const purgeMessages = async (interaction) => {
@@ -11,13 +12,13 @@ const purgeMessages = async (interaction) => {
     interaction.channel.bulkDelete(messages);
     interaction.reply({
       content: `Deleted ${Array.from(messages).length} messages.`,
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   })
   .catch(error => {
     interaction.reply({
       content: 'Failed to delete messages. This may be caused by attempting to delete messages that are over 2 weeks old.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   });
 };
