@@ -4,23 +4,22 @@ const { purgedMessages } = require('./logging');
 const purgeMessages = async (interaction) => {
   const amount = interaction.options.getInteger('amount');
 
-  interaction.channel.messages.fetch({ limit: amount })
-  .then(messages => {
+  try {
+    const messages = await interaction.channel.messages.fetch({ limit: amount });
     if (!(messages.size === 1)) {
       purgedMessages(messages, interaction.channel.url);
     }
-    interaction.channel.bulkDelete(messages);
-    interaction.reply({
+    await interaction.channel.bulkDelete(messages);
+    await interaction.reply({
       content: `Deleted ${Array.from(messages).length} messages.`,
       flags: MessageFlags.Ephemeral
     });
-  })
-  .catch(error => {
-    interaction.reply({
+  } catch (error) {
+    await interaction.reply({
       content: 'Failed to delete messages. This may be caused by attempting to delete messages that are over 2 weeks old.',
       flags: MessageFlags.Ephemeral
     });
-  });
+  }
 };
 
 module.exports = {
