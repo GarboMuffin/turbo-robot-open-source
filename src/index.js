@@ -36,7 +36,7 @@ client.once(Events.ClientReady, (client) => {
 });
 
 client.on(Events.ClientReady, (client) => {
-    setInterval(contactMods.ticketActivity, 30000);
+    setInterval(contactMods.ticketActivity, 1 * 60 * 1000);
 });
 
 client.on(Events.MessageCreate, async (message) => {
