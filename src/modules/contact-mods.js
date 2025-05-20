@@ -18,9 +18,9 @@ const ticketActivity = async () => {
   const contactChannel = await client.channels.fetch(config.contactChannelId);
   const activeThreads = await contactChannel.threads.fetchActive();
 
-  activeThreads.threads.forEach(async (thread) => {
+  const currentTime = Date.now();
+  for (const thread of activeThreads.threads) {
     const lastActivityTimestamp = thread.lastMessage?.createdTimestamp || thread.createdAt;
-    const currentTime = Date.now();
     const inactiveDuration = currentTime - lastActivityTimestamp;
 
     if (inactiveDuration >= 86400000) {
@@ -28,7 +28,7 @@ const ticketActivity = async () => {
       await thread.setLocked(true);
       await thread.setArchived(true);
     }
-  });
+  }
 };
 
 const contactMods = async (interaction) => {
