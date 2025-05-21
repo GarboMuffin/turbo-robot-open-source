@@ -65,7 +65,7 @@ const stringifyMessageContent = (message) => {
     if (message.system) {
         switch (message.type) {
             case MessageType.UserJoin:
-                return 'Join the server';
+                return 'Joined the server';
             case MessageType.GuildBoost:
                 return 'Boosted the server';
             case MessageType.PollResult:
