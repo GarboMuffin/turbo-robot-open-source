@@ -72,6 +72,8 @@ const stringifyMessageContent = (message) => {
                 return 'Poll ended';
             case MessageType.ChannelPinnedMessage:
                 return 'Pinned a message to this channel';
+            case MessageType.ThreadCreated:
+                return 'Created a thread';
             default:
                 return `!!!!! Unknown message type ${message.type} !!!!!`;
         }
