@@ -14,15 +14,17 @@ const editedMessage = async (oldMessage, newMessage) => {
     newMessage.channel.id === config.logChannelId ||
     newMessage.channel.id === config.starboardChannelId ||
     oldMessage.partial ||
-    (!oldMessage.content && !oldMessage.attachments) ||
+    (!oldMessage.content && !oldMessage.attachments && !oldMessage.messageSnapshots.first().content) ||
     oldMessage.author.bot
   ) {
     return;
   }
 
+  oldContent = oldMessage.messageSnapshots.first().content ? oldMessage.messageSnapshots.first().content : oldMessage.content;
+  newContent = newMessage.messageSnapshots.first().content ? newMessage.messageSnapshots.first().content : newMessage.content;
   const diff = unifiedDiff(
-    oldMessage.content.split('\n'),
-    newMessage.content.split('\n'),
+    oldContent.split('\n'),
+    newContent.split('\n'),
     { lineterm: '' }
   )
   .join('\n')
@@ -81,12 +83,13 @@ const deletedMessage = async (message) => {
     }));
   }
   if (!message.partial) {
-    if (message.content.length <= 250) {
-      log.content += `\n\`\`\`\n${message.content}\n\`\`\``;
+    content = message.messageSnapshots.first().content ? message.messageSnapshots.first().content : message.content;
+    if (content.length <= 250) {
+      log.content += `\n\`\`\`\n${content}\n\`\`\``;
     } else {
       log.files = log.files.concat([
         new AttachmentBuilder(
-          Buffer.from(message.content),
+          Buffer.from(content),
           { name: 'message.txt' }
         )
       ]);
@@ -101,7 +104,8 @@ const purgedMessages = async (messages, channelUrl) => {
 
   let deletedMessages = '';
   messages.reverse().forEach(message => {
-    deletedMessages += `${message.author.tag} said:\n${message.content || '[No Content]'}\n\n`;
+    content = message.messageSnapshots.first().content ? message.messageSnapshots.first().content : message.content;
+    deletedMessages += `${message.author.tag} said:\n${content || '[No Content]'}\n\n`;
   });
 
   let log = {
