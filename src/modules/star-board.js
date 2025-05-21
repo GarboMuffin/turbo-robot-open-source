@@ -70,6 +70,8 @@ const stringifyMessageContent = (message) => {
                 return 'Boosted the server';
             case MessageType.PollResult:
                 return 'Poll ended';
+            case MessageType.ChannelPinnedMessage:
+                return 'Pinned a message to this channel';
             default:
                 return `!!!!! Unknown message type ${message.type} !!!!!`;
         }
