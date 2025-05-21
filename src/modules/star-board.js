@@ -79,7 +79,7 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    return message.content;
+    return message.messageSnapshots ? `-# *↱ Forwarded message:*\n${message.messageSnapshots}` : message.content;
 };
 
 /**
