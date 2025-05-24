@@ -79,7 +79,7 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    return message.content;
+    return message.messageSnapshots.first().content ? `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}` : message.content;
 };
 
 /**
@@ -108,8 +108,9 @@ const updateMessage = async (message) => {
         ]
     };
 
+    const attachments = message.messageSnapshots.first().attachments ? message.messageSnapshots.first().attachments : message.attachments;
     if (BigInt(startingMessage.starboard_message_id) < 0) {
-        embedMessage.files = message.attachments.map(i => ({
+        embedMessage.files = attachments.map(i => ({
             name: i.name,
             attachment: i.url
         }));
