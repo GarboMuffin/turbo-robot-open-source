@@ -45,7 +45,7 @@ const commands = [
         .setDescription('Set slowmode in a channel, or freeze it')
         .addStringOption(option => option
             .setName('time')
-            .setDescription('Amount of time s/m/h to set slowmode to, or "freeze" to freeze.')
+            .setDescription('Amount of time in h/m/s to set slowmode to, or "freeze"/"unfreeze".')
             .setMaxLength(10)
         )
         .addStringOption(option => option
