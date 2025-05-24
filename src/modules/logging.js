@@ -76,8 +76,9 @@ const deletedMessage = async (message) => {
     content: `🗑 [Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
     allowedMentions: { parse: [] }
   };
-  if (message.attachments) {
-    log.files = message.attachments.map(attachment => ({
+  const attachments = message.messageSnapshots ? message.messageSnapshots.first().attachments : message.attachments;
+  if (attachments) {
+    log.files = attachments.map(attachment => ({
       name: attachment.name,
       attachment: attachment.url
     }));
