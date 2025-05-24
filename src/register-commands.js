@@ -40,6 +40,19 @@ const commands = [
         .setName('closethread')
         .setDescription('Locks and closes a thread')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads),
+    new SlashCommandBuilder()
+        .setName('slowmode')
+        .setDescription('Set slowmode in a channel, or freeze it')
+        .addStringOption(option => option
+            .setName('time')
+            .setDescription('Amount of time in h/m/s to set slowmode to, or "freeze"/"unfreeze".')
+            .setMaxLength(10)
+        )
+        .addStringOption(option => option
+            .setName('reason')
+            .setDescription('Reason why slowmode is being applied.')
+            .setMaxLength(1000)
+        ),
     new ContextMenuCommandBuilder()
         .setName('Report User')
         .setType(ApplicationCommandType.User),
