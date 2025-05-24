@@ -45,8 +45,13 @@ const commands = [
         .setDescription('Set slowmode in a channel, or freeze it')
         .addStringOption(option => option
             .setName('time')
-            .setDescription('Amount of time s/m/h to set slowmode to, or "freeze" to freeze. ')
+            .setDescription('Amount of time s/m/h to set slowmode to, or "freeze" to freeze.')
             .setMaxLength(10)
+        )
+        .addStringOption(option => option
+            .setName('reason')
+            .setDescription('Reason why slowmode is being applied.')
+            .setMaxLength(1000)
         ),
     new ContextMenuCommandBuilder()
         .setName('Report User')
