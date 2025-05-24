@@ -14,17 +14,15 @@ const editedMessage = async (oldMessage, newMessage) => {
     newMessage.channel.id === config.logChannelId ||
     newMessage.channel.id === config.starboardChannelId ||
     oldMessage.partial ||
-    (!oldMessage.content && !oldMessage.attachments && !oldMessage.messageSnapshots.first().content) ||
+    (!oldMessage.content && !oldMessage.attachments) ||
     oldMessage.author.bot
   ) {
     return;
   }
 
-  oldContent = oldMessage.messageSnapshots ? oldMessage.messageSnapshots.first().content : oldMessage.content;
-  newContent = newMessage.messageSnapshots ? newMessage.messageSnapshots.first().content : newMessage.content;
   const diff = unifiedDiff(
-    oldContent.split('\n'),
-    newContent.split('\n'),
+    oldMessage.content.split('\n'),
+    newMessage.content.split('\n'),
     { lineterm: '' }
   )
   .join('\n')
