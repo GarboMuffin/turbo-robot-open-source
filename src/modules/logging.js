@@ -73,7 +73,7 @@ const deletedMessage = async (message) => {
   }
 
   let log = {
-    content: `🗑 [Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
+    content: `🗑 [${message.messageSnapshots ? "Forwarded "}Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
     allowedMentions: { parse: [] }
   };
   const attachments = message.messageSnapshots ? message.messageSnapshots.first().attachments : message.attachments;
