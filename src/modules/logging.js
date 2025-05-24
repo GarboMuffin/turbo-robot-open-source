@@ -20,8 +20,8 @@ const editedMessage = async (oldMessage, newMessage) => {
     return;
   }
 
-  oldContent = oldMessage.messageSnapshots.first().content ? oldMessage.messageSnapshots.first().content : oldMessage.content;
-  newContent = newMessage.messageSnapshots.first().content ? newMessage.messageSnapshots.first().content : newMessage.content;
+  oldContent = oldMessage.messageSnapshots ? oldMessage.messageSnapshots.first().content : oldMessage.content;
+  newContent = newMessage.messageSnapshots ? newMessage.messageSnapshots.first().content : newMessage.content;
   const diff = unifiedDiff(
     oldContent.split('\n'),
     newContent.split('\n'),
