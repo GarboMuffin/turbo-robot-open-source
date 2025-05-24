@@ -103,8 +103,7 @@ const purgedMessages = async (messages, channelUrl) => {
 
   let deletedMessages = '';
   messages.reverse().forEach(message => {
-    content = message.messageSnapshots.first().content ? message.messageSnapshots.first().content : message.content;
-    deletedMessages += `${message.author.tag} said:\n${content || '[No Content]'}\n\n`;
+    deletedMessages += `${message.author.tag} said:\n${message.content || '[No Content]'}\n\n`;
   });
 
   let log = {
