@@ -13,7 +13,6 @@ const purgeMessages = async (interaction) => {
       flags: MessageFlags.Ephemeral
     });
   } catch (error) {
-    console.error(error);
     await interaction.reply({
       content: 'Failed to delete messages. This may be caused by attempting to delete messages that are over 2 weeks old.',
       flags: MessageFlags.Ephemeral
