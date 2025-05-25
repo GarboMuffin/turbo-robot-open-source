@@ -26,24 +26,28 @@ const slowmode = async (interaction) => {
     await interaction.channel.permissionOverwrites.edit(message.guild.roles.everyone.id, {
       SendMessages: false,
       AttachFiles: false,
-      CreatePrivateThreads: false
+      CreatePrivateThreads: false,
+      CreatePublicThreads: false
     });
     await interaction.channel.permissionOverwrites.edit(modRole.id, {
       SendMessages: true,
       AttachFiles: true,
-      CreatePrivateThreads: true
+      CreatePrivateThreads: true,
+      CreatePublicThreads: true
     });
     await interaction.reply(`❄️ Froze the channel.`);
   } else if (slowmodeTime == "unfreeze") {
     await interaction.channel.permissionOverwrites.edit(message.guild.roles.everyone.id, {
       SendMessages: null,
       AttachFiles: null,
-      CreatePrivateThreads: null
+      CreatePrivateThreads: null,
+      CreatePublicThreads: null
     });
     await interaction.channel.permissionOverwrites.edit(modRole.id, {
       SendMessages: null,
       AttachFiles: null,
-      CreatePrivateThreads: null
+      CreatePrivateThreads: null,
+      CreatePublicThreads: null
     });
     await interaction.reply(`☀️ Unfroze the channel.`);
   } else if (slowmodeTime == "") {
