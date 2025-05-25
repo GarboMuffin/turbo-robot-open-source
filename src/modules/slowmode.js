@@ -1,4 +1,5 @@
 const { MessageFlags, Permissions } = require('discord.js');
+const config = require('../../config');
 
 const slowmode = async (interaction) => {
   const slowmodeTime = interaction.options.getString('time');
