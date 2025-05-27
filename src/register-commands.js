@@ -52,7 +52,8 @@ const commands = [
             .setName('reason')
             .setDescription('Reason why slowmode is being applied.')
             .setMaxLength(1000)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     new ContextMenuCommandBuilder()
         .setName('Report User')
         .setType(ApplicationCommandType.User),
