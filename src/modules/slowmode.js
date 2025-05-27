@@ -20,7 +20,7 @@ const slowmode = async (interaction) => {
     if (timeInSeconds == 0) {
       await interaction.reply(`⛅ Removed slowmode from this channel.`);
     } else {
-      await interaction.reply(`🌨️ Set slowmode for this channel to **${slowmodeTime.replace(/\s+/g, '');}**.`);
+      await interaction.reply(`🌨️ Set slowmode for this channel to **${slowmodeTime.replace(/\s+/g, '')}**.`);
     }
   } else if (slowmodeTime == "freeze") {
     await interaction.channel.permissionOverwrites.edit(message.guild.roles.everyone.id, {
