@@ -42,15 +42,35 @@ const commands = [
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads),
     new SlashCommandBuilder()
         .setName('slowmode')
-        .setDescription('Set slowmode in a channel, or freeze it')
+        .setDescription('Set slowmode in the current channel')
+        .addBooleanOption(option => option
+            .setName('state')
+            .setDescription('Whether or not slowmode is enabled')
+            .setRequired(true)
+        )
         .addStringOption(option => option
             .setName('time')
-            .setDescription('Amount of time in h/m/s to set slowmode to, or "freeze"/"unfreeze".')
-            .setMaxLength(10)
+            .setDescription('Amount of time slowmode is set to')
+            .addChoices(
+                { name: '5 seconds', value: '5' },
+                { name: '10 seconds', value: '10' },
+                { name: '15 seconds', value: '15' },
+                { name: '30 seconds', value: '30' },
+                { name: '1 minute', value: '60' },
+                { name: '2 minutes', value: '120' },
+                { name: '5 minutes', value: '300' },
+                { name: '10 minutes', value: '600' },
+                { name: '15 minutes', value: '900' },
+                { name: '30 minutes', value: '1800' },
+                { name: '1 hour', value: '3600' },
+                { name: '2 hours', value: '7200' },
+                { name: '6 hours', value: '21600' },
+                { name: 'freeze', value: 'freeze'}
+            )
         )
         .addStringOption(option => option
             .setName('reason')
-            .setDescription('Reason why slowmode is being applied.')
+            .setDescription('Reason why slowmode is being applied')
             .setMaxLength(1000)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
