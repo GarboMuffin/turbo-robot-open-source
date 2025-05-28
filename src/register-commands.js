@@ -65,7 +65,7 @@ const commands = [
                 { name: '1 hour', value: '3600' },
                 { name: '2 hours', value: '7200' },
                 { name: '6 hours', value: '21600' },
-                { name: 'freeze', value: 'freeze'}
+                { name: 'freeze', value: 'freeze' }
             )
         )
         .addStringOption(option => option
