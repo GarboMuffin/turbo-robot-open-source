@@ -19,7 +19,6 @@ const slowmode = async (interaction) => {
         interaction.guild.roles.everyone,
         {
           [PermissionsBitField.Flags.SendMessages]: false,
-          [PermissionsBitField.Flags.ManageMessages]: false,
           [PermissionsBitField.Flags.CreatePublicThreads]: false,
           [PermissionsBitField.Flags.CreatePrivateThreads]: false,
         }
@@ -27,7 +26,6 @@ const slowmode = async (interaction) => {
 
       await interaction.channel.permissionOverwrites.edit(modRole, {
         [PermissionsBitField.Flags.SendMessages]: true,
-        [PermissionsBitField.Flags.ManageMessages]: true,
         [PermissionsBitField.Flags.CreatePublicThreads]: true,
         [PermissionsBitField.Flags.CreatePrivateThreads]: true,
       });
@@ -70,7 +68,6 @@ const slowmode = async (interaction) => {
       interaction.guild.roles.everyone,
       {
         [PermissionsBitField.Flags.SendMessages]: null,
-        [PermissionsBitField.Flags.ManageMessages]: null,
         [PermissionsBitField.Flags.CreatePublicThreads]: null,
         [PermissionsBitField.Flags.CreatePrivateThreads]: null,
       }
@@ -78,7 +75,6 @@ const slowmode = async (interaction) => {
 
     await interaction.channel.permissionOverwrites.edit(modRole, {
       [PermissionsBitField.Flags.SendMessages]: null,
-      [PermissionsBitField.Flags.ManageMessages]: null,
       [PermissionsBitField.Flags.CreatePublicThreads]: null,
       [PermissionsBitField.Flags.CreatePrivateThreads]: null,
     });
