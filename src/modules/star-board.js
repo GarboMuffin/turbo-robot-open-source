@@ -79,7 +79,7 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    return message.messageSnapshots.size() > 0 ? `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}` : message.content;
+    return message.messageSnapshots.size > 0 ? `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}` : message.content;
 };
 
 /**
@@ -108,7 +108,7 @@ const updateMessage = async (message) => {
         ]
     };
 
-    const attachments = message.messageSnapshots.size() > 0 ? message.messageSnapshots.first().attachments : message.attachments;
+    const attachments = message.messageSnapshots.size > 0 ? message.messageSnapshots.first().attachments : message.attachments;
     if (BigInt(startingMessage.starboard_message_id) < 0) {
         embedMessage.files = attachments.map(i => ({
             name: i.name,
