@@ -25,6 +25,7 @@ const contactMods = require('./modules/contact-mods');
 const purgeMessages = require('./modules/purge-messages');
 const thread = require('./modules/thread');
 const logging = require('./modules/logging');
+const timeout = require('./modules/timeout');
 const bigBrother = tryRequire('./modules/big-brother');
 
 client.once(Events.ClientReady, (client) => {
@@ -97,6 +98,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 break;
             case 'closethread':
                 await thread.close(interaction);
+                break;
+            case 'timeout':
+                await timeout.timeout(interaction);
                 break;
             case 'Report User':
                 await contactMods.reportUser(interaction);
