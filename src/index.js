@@ -22,7 +22,6 @@ const tryRequire = (path) => {
 
 const starBoard = require('./modules/star-board');
 const contactMods = require('./modules/contact-mods');
-const pingMods = require('./modules/ping-mods');
 const purgeMessages = require('./modules/purge-messages');
 const thread = require('./modules/thread');
 const logging = require('./modules/logging');
@@ -94,7 +93,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 await contactMods.contactMods(interaction);
                 break;
             case 'pingmods':
-                await pingMods.pingMods(interaction);
+                await contactMods.pingMods(interaction);
                 break;
             case 'purge':
                 await purgeMessages.purgeMessages(interaction);
