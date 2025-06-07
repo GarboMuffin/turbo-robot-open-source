@@ -4,7 +4,7 @@ const timeout = async (interaction) => {
   const user = interaction.options.getUser('user');
   const member = interaction.options.getMember('user');
   const amount = interaction.options.getInteger('time') ?? 60;
-  const reason = interaction.options.getReason('reason') ?? "No reason provided";
+  const reason = interaction.options.getString('reason') ?? "No reason provided";
 
   try {
     if (member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {

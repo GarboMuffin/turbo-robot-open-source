@@ -37,7 +37,7 @@ const commands = [
         )
         .addIntegerOption(option => option
             .setName('time')
-            .setDescription('Amount of time the user is timed out for, in hours')
+            .setDescription('Amount of time the user is timed out for')
             .addChoices(
                 { name: '1 minute', value: 1 },
                 { name: '3 minutes', value: 3 },
