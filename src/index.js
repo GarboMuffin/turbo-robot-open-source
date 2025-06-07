@@ -92,6 +92,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             case 'contactmods':
                 await contactMods.contactMods(interaction);
                 break;
+            case 'pingmods':
+                await contactMods.pingMods(interaction);
+                break;
             case 'purge':
                 await purgeMessages.purgeMessages(interaction);
                 break;
