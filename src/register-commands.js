@@ -14,7 +14,7 @@ const {
 const commands = [
     new SlashCommandBuilder()
         .setName('contactmods')
-        .setDescription('Contact moderators without posting a public message (previously /pingmods)')
+        .setDescription('Contact moderators without posting a public message')
         .addStringOption(option => option
             .setName('topic')
             .setDescription('What are you contacting us about?')
@@ -26,6 +26,14 @@ const commands = [
             .setDescription('Give us information on why you are contacting us.')
             .setMaxLength(1000)
             .setRequired(true)
+        ),
+    new SlashCommandBuilder()
+        .setName('pingmods')
+        .setDescription('Ping moderators without posting a public message')
+        .addStringOption(option => option
+            .setName('reason')
+            .setDescription('Message will be provided to moderators.')
+            .setMaxLength(1000)
         ),
     new SlashCommandBuilder()
         .setName('purge')
