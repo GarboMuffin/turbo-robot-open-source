@@ -74,7 +74,7 @@ const deletedMessage = async (message) => {
     content: `🗑 [${message.messageSnapshots.first() ? 'Forwarded ' : ''}Message](${message.url}) by ${message.partial ? 'an unknown user' : `<@${message.author.id}>`} was deleted in ${message.channel.url}`,
     allowedMentions: { parse: [] }
   };
-  const attachments = message.messageSnapshots.first().attachments ? message.messageSnapshots.first().attachments : message.attachments;
+  const attachments = message.messageSnapshots.first() ? message.messageSnapshots.first().attachments : message.attachments;
   if (attachments) {
     log.files = attachments.map(attachment => ({
       name: attachment.name,
@@ -82,7 +82,7 @@ const deletedMessage = async (message) => {
     }));
   }
   if (!message.partial) {
-    content = message.messageSnapshots.first().content ? message.messageSnapshots.first().content : message.content;
+    content = message.messageSnapshots.first() ? message.messageSnapshots.first().content : message.content;
     if (content.length <= 250) {
       log.content += `\n\`\`\`\n${content}\n\`\`\``;
     } else {
