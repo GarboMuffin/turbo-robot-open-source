@@ -15,12 +15,12 @@ const timeout = async (interaction) => {
       await interaction.reply({
         content: `⏲️ Successfully timed out <@${user.id}> for ${amount} minutes with reason: ${reason}`,
         flags: MessageFlags.Ephemeral
-      })
+      });
     } else {
       await interaction.reply({
         content: `Failed to timeout user: You can't timeout moderators!`,
         flags: MessageFlags.Ephemeral
-      })
+      });
     }
   } catch (error) {
     console.error(error);
