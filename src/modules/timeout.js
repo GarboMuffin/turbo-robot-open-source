@@ -24,6 +24,7 @@ const timeout = async (interaction) => {
       })
     }
   } catch (error) {
+    console.error(error);
     await interaction.reply({
       content: 'Failed to timeout user.',
       flags: MessageFlags.Ephemeral
