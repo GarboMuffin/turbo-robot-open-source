@@ -10,8 +10,7 @@ const timeout = async (interaction) => {
     if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
       await member.timeout(amount*60000, reason);
       await user.send({
-        content: `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`,
-        flags: MessageFlags.SuppressNotifications
+        content: `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`
       });
       await interaction.reply({
         content: `⏲️ Successfully timed out <@${user.id}> for ${amount} minutes with reason: ${reason}`,
