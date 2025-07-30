@@ -1,10 +1,12 @@
 const {
     Events,
-    ActivityType
+    ActivityType,
+    AuditLogEvent
 } = require('discord.js');
 const {
     token
 } = require('../config');
+const lodash = require("lodash");
 
 const client = require('./client');
 
@@ -36,8 +38,11 @@ client.once(Events.ClientReady, (client) => {
     });
 });
 
-client.on(Events.ClientReady, (client) => {
+let invites;
+
+client.on(Events.ClientReady, async (client) => {
     setInterval(contactMods.ticketActivity, 1 * 60 * 1000);
+    invites = await client.guilds.cache.first().invites.fetch();
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -129,7 +134,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
-    await logging.userJoin(member);
+    await logging.userJoin(member,lodash.cloneDeep(invites));
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
@@ -138,6 +143,9 @@ client.on(Events.GuildMemberRemove, async (member) => {
 
 client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
     await logging.auditLogs(auditLog);
+    if (auditLog.action == AuditLogEvent.InviteCreate) {
+        invites = await client.guilds.cache.first().invites.fetch();
+    };
 });
 
 client.login(token);
