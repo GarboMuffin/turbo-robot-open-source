@@ -49,7 +49,11 @@ const editedMessage = async (oldMessage, newMessage) => {
       if (diff) {
         log.content += `\n\`\`\`diff\n${diff}\n\`\`\``;
       } else {
-        nocontent = true
+        if (oldMessage.attachments !== newMessage.attachments) {
+          log.content += `\n\`\`\`[No Content]\`\`\``;
+        } else {
+          nocontent = true
+        }
       }
     } else {
       log.files = log.files.concat([
