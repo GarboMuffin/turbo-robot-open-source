@@ -74,6 +74,10 @@ const stringifyMessageContent = (message) => {
                 return 'Pinned a message to this channel';
             case MessageType.ThreadCreated:
                 return 'Created a thread';
+            case MessageType.RecipientAdd:
+                return `Added <@${message.mentions.users.first().id}> to a thread`;   
+            case MessageType.RecipientRemove:
+                return `Removed <@${message.mentions.users.first().id}> from a thread`;
             default:
                 return `!!!!! Unknown message type ${message.type} !!!!!`;
         }
