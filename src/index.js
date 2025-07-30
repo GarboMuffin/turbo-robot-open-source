@@ -6,7 +6,7 @@ const {
 const {
     token
 } = require('../config');
-const lodash = require("lodash");
+const cloneDeep = require("lodash.clonedeep");
 
 const client = require('./client');
 
@@ -134,7 +134,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
-    await logging.userJoin(member,lodash.cloneDeep(invites));
+    await logging.userJoin(member,cloneDeep(invites));
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
