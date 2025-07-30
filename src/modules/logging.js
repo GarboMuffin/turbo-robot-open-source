@@ -31,6 +31,7 @@ const editedMessage = async (oldMessage, newMessage) => {
   let log = {
     allowedMentions: { parse: [] }
   };
+  let nocontent = false
   if (oldMessage.pinned !== newMessage.pinned) {
     log.content = `📌 [Message](${newMessage.url}) by <@${newMessage.author.id}> was ${newMessage.pinned ? '' : 'un'}pinned in ${newMessage.channel.url}`;
   } else if (oldMessage.flags.has('SuppressEmbeds') !== newMessage.flags.has('SuppressEmbeds')) {
@@ -45,7 +46,11 @@ const editedMessage = async (oldMessage, newMessage) => {
       }));
     }
     if (diff.length <= 250) {
-      log.content += `\n\`\`\`${diff ? `diff\n${diff}` : '\n[No Content]'}\n\`\`\``;
+      if (diff) {
+        log.content += `\n\`\`\`diff\n${diff}\n\`\`\``;
+      } else {
+        nocontent = true
+      }
     } else {
       log.files = log.files.concat([
         new AttachmentBuilder(
@@ -55,8 +60,9 @@ const editedMessage = async (oldMessage, newMessage) => {
       ]);
     }
   }
-
-  await logChannel.send(log);
+  if (!nocontent) {
+    await logChannel.send(log);
+  }
 };
 
 const deletedMessage = async (message) => {
