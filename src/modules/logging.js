@@ -166,14 +166,23 @@ const userJoin = async (member,oldInvites) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
   member.guild.invites.fetch().then(newInvites => {
-    const invite = [...newInvites.values()].find(i => {
+    const matchingInvites = [...newInvites.values()].filter(i => {
       const old = oldInvites.get(i.code);
       return old && i.uses > old.uses;
     });
 
-    if (invite) {
+    let invitestring = ""
+    if (matchingInvites[0]) {
+      invitestring = "\n🏷️ Invites incremented:"
+      for (let i = 0; i < matchingInvites.length; i++) {
+        const invite = matchingInvites[i];
+        invitestring += `\n\`${invite.code}\` by <@${invite.inviterId}>, ${invite.uses} use(s)`
+      }
+    }
+
+    if (matchingInvites[0]) {
       logChannel.send({
-        content: `👤 <@${member.user.id}> joined the server using invite code \`${invite.code}\` from <@${invite.inviterId}> (uses: ${invite.uses})`,
+        content: `👤 <@${member.user.id}> joined the server${invitestring}`,
         allowedMentions: { parse: [] }
       });
     } else {
