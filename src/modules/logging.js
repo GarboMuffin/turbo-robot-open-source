@@ -176,7 +176,7 @@ const userJoin = async (member,oldInvites) => {
       invitestring = "\n🏷️ Invites incremented:"
       for (let i = 0; i < matchingInvites.length; i++) {
         const invite = matchingInvites[i];
-        invitestring += `\n\`${invite.code}\` by <@${invite.inviterId}>, ${invite.uses} use(s)`
+        invitestring += ` \`${invite.code}\` by <@${invite.inviterId}>, ${invite.uses} use(s)${i == matchingInvites.length-1 ? "" : ","}`
       }
     }
 
