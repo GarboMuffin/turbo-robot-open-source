@@ -102,6 +102,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 break;
             case 'slowmode':
                 await slowmode.slowmode(interaction);
+                break;
             case 'timeout':
                 await timeout.timeout(interaction);
                 break;
