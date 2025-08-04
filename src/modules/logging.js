@@ -172,12 +172,35 @@ const voiceChat = async (oldState, newState) => {
   await logChannel.send(log);
 }
 
-const userJoin = async (member) => {
+const userJoin = async (member,oldInvites) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
-  await logChannel.send({
-    content: `👤 <@${member.user.id}> joined the server`,
-    allowedMentions: { parse: [] }
+  member.guild.invites.fetch().then(newInvites => {
+    const matchingInvites = [...newInvites.values()].filter(i => {
+      const old = oldInvites.get(i.code);
+      return old && i.uses > old.uses;
+    });
+
+    let invitestring = ""
+    if (matchingInvites[0]) {
+      invitestring = "\n🏷️ Invites incremented:"
+      for (let i = 0; i < matchingInvites.length; i++) {
+        const invite = matchingInvites[i];
+        invitestring += ` \`${invite.code}\` by <@${invite.inviterId}>, ${invite.uses} use(s)${i == matchingInvites.length-1 ? "" : ","}`
+      }
+    }
+
+    if (matchingInvites[0]) {
+      logChannel.send({
+        content: `👤 <@${member.user.id}> joined the server${invitestring}`,
+        allowedMentions: { parse: [] }
+      });
+    } else {
+      logChannel.send({
+        content: `👤 <@${member.user.id}> joined the server from an unknown invite`,
+        allowedMentions: { parse: [] }
+      });
+    };
   });
 };
 
