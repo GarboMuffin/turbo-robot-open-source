@@ -27,6 +27,7 @@ const contactMods = require('./modules/contact-mods');
 const purgeMessages = require('./modules/purge-messages');
 const thread = require('./modules/thread');
 const logging = require('./modules/logging');
+const slowmode = require('./modules/slowmode');
 const timeout = require('./modules/timeout');
 const bigBrother = tryRequire('./modules/big-brother');
 
@@ -103,6 +104,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 break;
             case 'closethread':
                 await thread.close(interaction);
+                break;
+            case 'slowmode':
+                await slowmode.slowmode(interaction);
                 break;
             case 'timeout':
                 await timeout.timeout(interaction);
