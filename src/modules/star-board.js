@@ -68,6 +68,12 @@ const stringifyMessageContent = (message) => {
                 return 'Joined the server';
             case MessageType.GuildBoost:
                 return 'Boosted the server';
+            case MessageType.GuildBoostTier1:
+                return 'Boosted the server and made it reach level 1';
+            case MessageType.GuildBoostTier2:
+                return 'Boosted the server and made it reach level 2';
+            case MessageType.GuildBoostTier3:
+                return 'Boosted the server and made it reach level 3';
             case MessageType.PollResult:
                 return 'Poll ended';
             case MessageType.ChannelPinnedMessage:
