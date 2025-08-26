@@ -1,4 +1,4 @@
-const {PermissionsBitField, MessageType} = require('discord.js');
+const {PermissionsBitField, MessageType, DMChannel} = require('discord.js');
 const client = require('../client');
 const db = require('../db');
 const config = require('../../config');
@@ -32,6 +32,10 @@ const COLORS = [
 ];
 
 const isPublicChannel = (channel) => {
+    if (channel instanceof DMChannel) {
+        return false;
+    }
+
     const DISABLED_CHANNELS = [
         config.starboardChannelId,
         '1100160429382193193', // #updates

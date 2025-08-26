@@ -1,6 +1,7 @@
 const {
   AttachmentBuilder,
-  AuditLogEvent
+  AuditLogEvent,
+  DMChannel
 } = require('discord.js');
 const { unifiedDiff } = require('difflib');
 const client = require('../client');
@@ -10,6 +11,7 @@ const editedMessage = async (oldMessage, newMessage) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
   if (
+    newMessage.channel instanceof DMChannel ||
     newMessage.channel.id === config.modChannelId ||
     newMessage.channel.id === config.logChannelId ||
     newMessage.channel.id === config.starboardChannelId ||
@@ -73,6 +75,7 @@ const deletedMessage = async (message) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
   if (
+    message.channel instanceof DMChannel ||
     message.channel.id === config.modChannelId ||
     message.channel.id === config.logChannelId ||
     message.channel.id === config.starboardChannelId
