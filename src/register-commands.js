@@ -74,6 +74,7 @@ const commands = [
         .setName('closethread')
         .setDescription('Locks and closes a thread')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads),
+    /*
     new SlashCommandBuilder()
         .setName('slowmode')
         .setDescription('Set slowmode in the current channel')
@@ -108,6 +109,7 @@ const commands = [
             .setMaxLength(1000)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+    */
     new ContextMenuCommandBuilder()
         .setName('Report User')
         .setType(ApplicationCommandType.User),
