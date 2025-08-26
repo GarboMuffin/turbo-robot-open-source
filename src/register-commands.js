@@ -39,10 +39,6 @@ const commands = [
             .setName('time')
             .setDescription('Amount of time the user is timed out for')
             .addChoices(
-                { name: '1 minute', value: 1 },
-                { name: '3 minutes', value: 3 },
-                { name: '5 minutes', value: 5 },
-                { name: '10 minutes', value: 10 },
                 { name: '30 minutes', value: 30 },
                 { name: '1 hour', value: 60 },
                 { name: '6 hours', value: 360 },
