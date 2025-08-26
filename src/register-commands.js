@@ -46,9 +46,7 @@ const commands = [
                 { name: '1 day', value: 1440 },
                 { name: '2 days', value: 2880 },
                 { name: '3 days', value: 4320 },
-                { name: '1 week', value: 10080 },
-                { name: '2 weeks', value: 20160 },
-                { name: '4 weeks', value: 40320 }
+                { name: '1 week', value: 10080 }
             )
         )
         .addStringOption(option => option
