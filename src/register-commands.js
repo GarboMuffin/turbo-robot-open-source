@@ -4,7 +4,8 @@ const {
     SlashCommandBuilder,
     ContextMenuCommandBuilder,
     ApplicationCommandType,
-    PermissionFlagsBits
+    PermissionFlagsBits,
+    InteractionContextType
 } = require('discord.js');
 const {
     applicationId,
@@ -26,7 +27,8 @@ const commands = [
             .setDescription('Give us information on why you are contacting us.')
             .setMaxLength(1000)
             .setRequired(true)
-        ),
+        )
+        .setContexts(InteractionContextType.Guild),
     new SlashCommandBuilder()
         .setName('timeout')
         .setDescription('Timeout a user')
@@ -51,13 +53,16 @@ const commands = [
                 { name: '3 days', value: 4320 },
                 { name: '1 week', value: 10080 }
             )
+            .setRequired(true)
         )
         .addStringOption(option => option
             .setName('reason')
             .setDescription('Reason why timeout is being applied')
             .setMaxLength(1000)
+            .setRequired(true)
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+        .setContexts(InteractionContextType.Guild),
     new SlashCommandBuilder()
         .setName('purge')
         .setDescription('Purge messages in the current channel')
@@ -66,11 +71,13 @@ const commands = [
             .setDescription('Amount of messages to purge')
             .setRequired(true)
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setContexts(InteractionContextType.Guild),
     new SlashCommandBuilder()
         .setName('closethread')
         .setDescription('Locks and closes a thread')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads)
+        .setContexts(InteractionContextType.Guild),
     /*
     new SlashCommandBuilder()
         .setName('slowmode')
@@ -105,20 +112,25 @@ const commands = [
             .setDescription('Reason why slowmode is being applied')
             .setMaxLength(1000)
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setContexts(InteractionContextType.Guild),
     */
     new ContextMenuCommandBuilder()
         .setName('Report User')
-        .setType(ApplicationCommandType.User),
+        .setType(ApplicationCommandType.User)
+        .setContexts(InteractionContextType.Guild),
     new ContextMenuCommandBuilder()
         .setName('Report Message')
-        .setType(ApplicationCommandType.Message),
+        .setType(ApplicationCommandType.Message)
+        .setContexts(InteractionContextType.Guild),
     new ContextMenuCommandBuilder()
         .setName('Thread owner: Pin')
-        .setType(ApplicationCommandType.Message),
+        .setType(ApplicationCommandType.Message)
+        .setContexts(InteractionContextType.Guild),
     new ContextMenuCommandBuilder()
         .setName('Thread owner: Unpin')
         .setType(ApplicationCommandType.Message)
+        .setContexts(InteractionContextType.Guild)
 ];
 
 const run = async () => {
