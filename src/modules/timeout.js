@@ -6,26 +6,51 @@ const timeout = async (interaction) => {
   const amount = interaction.options.getInteger('time') ?? 60;
   const reason = interaction.options.getString('reason') ?? "No reason provided";
 
+  if (!member) {
+    await interaction.reply({
+      content: `Couldn't find member`,
+      flags: MessageFlags.Ephemeral
+    });
+    return;
+  }
+
+  if (member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+    await interaction.reply({
+      content: `Can't time out moderators`,
+      flags: MessageFlags.Ephemeral
+    });
+    return;
+  }
+
   try {
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-      await member.timeout(amount*60000, reason);
-      await user.send({
-        content: `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`
-      });
-      await interaction.reply({
-        content: `⏲️ Successfully timed out <@${user.id}> for ${amount} minutes with reason: ${reason}`,
-        flags: MessageFlags.Ephemeral
-      });
-    } else {
-      await interaction.reply({
-        content: `Failed to timeout user: You can't timeout moderators!`,
-        flags: MessageFlags.Ephemeral
-      });
-    }
+    await member.timeout(amount * 60000, reason);
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Failed to timeout user.',
+      flags: MessageFlags.Ephemeral
+    });
+    return;
+  }
+
+  let sentMessage = false;
+  try {
+    await user.send({
+      content: `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`
+    });
+    sentMessage = true;
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (sentMessage) {
+    await interaction.reply({
+      content: `⏲️ <@${user.id}> timed out for ${amount} minutes because ${reason} (and DM was sent)`,
+      flags: MessageFlags.Ephemeral
+    });
+  } else {
+    await interaction.reply({
+      content: `⏲️ <@${user.id}> timed out for ${amount} minutes because ${reason} (but could not send DM)`,
       flags: MessageFlags.Ephemeral
     });
   }
