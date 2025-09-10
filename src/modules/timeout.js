@@ -6,7 +6,7 @@ const timeout = async (interaction) => {
   const amount = interaction.options.getInteger('time') ?? 60;
   const reason = interaction.options.getString('reason') ?? "No reason provided";
 
-  await interaction.deferReply({flags: MessageFlags.Ephemeral});
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   if (!member) {
     await interaction.editReply({
