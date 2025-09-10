@@ -6,8 +6,10 @@ const timeout = async (interaction) => {
   const amount = interaction.options.getInteger('time') ?? 60;
   const reason = interaction.options.getString('reason') ?? "No reason provided";
 
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
   if (!member) {
-    await interaction.reply({
+    await interaction.editReply({
       content: `Couldn't find member`,
       flags: MessageFlags.Ephemeral
     });
@@ -15,7 +17,7 @@ const timeout = async (interaction) => {
   }
 
   if (member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-    await interaction.reply({
+    await interaction.editReply({
       content: `Can't time out moderators`,
       flags: MessageFlags.Ephemeral
     });
@@ -26,7 +28,7 @@ const timeout = async (interaction) => {
     await member.timeout(amount * 60000, reason);
   } catch (error) {
     console.error(error);
-    await interaction.reply({
+    await interaction.editReply({
       content: 'Failed to timeout user.',
       flags: MessageFlags.Ephemeral
     });
@@ -44,12 +46,12 @@ const timeout = async (interaction) => {
   }
 
   if (sentMessage) {
-    await interaction.reply({
+    await interaction.editReply({
       content: `⏲️ <@${user.id}> timed out for ${amount} minutes because ${reason} (and DM was sent)`,
       flags: MessageFlags.Ephemeral
     });
   } else {
-    await interaction.reply({
+    await interaction.editReply({
       content: `⏲️ <@${user.id}> timed out for ${amount} minutes because ${reason} (but could not send DM)`,
       flags: MessageFlags.Ephemeral
     });

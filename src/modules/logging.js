@@ -17,7 +17,8 @@ const editedMessage = async (oldMessage, newMessage) => {
     newMessage.channel.id === config.starboardChannelId ||
     oldMessage.partial ||
     (!oldMessage.content && !oldMessage.attachments) ||
-    oldMessage.author.bot
+    oldMessage.author.bot ||
+    newMessage.editedTimestamp == null 
   ) {
     return;
   }
@@ -33,7 +34,6 @@ const editedMessage = async (oldMessage, newMessage) => {
   let log = {
     allowedMentions: { parse: [] }
   };
-  let nocontent = false
   if (oldMessage.pinned !== newMessage.pinned) {
     log.content = `📌 [Message](${newMessage.url}) by <@${newMessage.author.id}> was ${newMessage.pinned ? '' : 'un'}pinned in ${newMessage.channel.url}`;
   } else if (oldMessage.flags.has('SuppressEmbeds') !== newMessage.flags.has('SuppressEmbeds')) {
@@ -51,11 +51,7 @@ const editedMessage = async (oldMessage, newMessage) => {
       if (diff) {
         log.content += `\n\`\`\`diff\n${diff}\n\`\`\``;
       } else {
-        if (oldMessage.attachments !== newMessage.attachments) {
-          log.content += `\n\`\`\`[No Content]\`\`\``;
-        } else {
-          nocontent = true
-        }
+        log.content += `\n\`\`\`[No Content]\`\`\``;
       }
     } else {
       log.files = log.files.concat([
@@ -66,9 +62,7 @@ const editedMessage = async (oldMessage, newMessage) => {
       ]);
     }
   }
-  if (!nocontent) {
-    await logChannel.send(log);
-  }
+  await logChannel.send(log);
 };
 
 const deletedMessage = async (message) => {
