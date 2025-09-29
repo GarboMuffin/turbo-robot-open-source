@@ -107,7 +107,7 @@ const updateMessage = async (message) => {
     const messageContent = stringifyMessageContent(message);
     const embedMessage = {
         allowedMentions: {},
-        content: `${EMOJI} **${startingMessage.count}** - ${message.url}`,
+        content: `${EMOJI} **${startingMessage.count}** - ${message.url} (${message.author.id})`,
         embeds: [
             {
                 color: COLORS[BigInt(message.id) % BigInt(COLORS.length)],
