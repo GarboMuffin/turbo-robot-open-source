@@ -114,6 +114,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             case 'timeout':
                 await timeout.timeout(interaction);
                 break;
+            case 'botdm':
+                await dmMail.handleSendDirectMessage(interaction);
+                break;
             case 'Report User':
                 await contactMods.reportUser(interaction);
                 break;

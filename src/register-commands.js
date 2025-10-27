@@ -78,6 +78,23 @@ const commands = [
         .setDescription('Locks and closes a thread')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads)
         .setContexts(InteractionContextType.Guild),
+    new SlashCommandBuilder()
+        .setName('botdm')
+        .setDescription('Send a DM as the bot')
+        .addUserOption(option => option
+            .setName('user')
+            .setDescription('The user to message')
+            .setRequired(true)
+        )
+        .addStringOption(option => option
+            .setName('message')
+            .setDescription('What to send them')
+            .setMinLength(5)
+            .setMaxLength(1000)
+            .setRequired(true)
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+        .setContexts(InteractionContextType.Guild),
     /*
     new SlashCommandBuilder()
         .setName('slowmode')
