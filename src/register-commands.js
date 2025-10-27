@@ -58,6 +58,7 @@ const commands = [
         .addStringOption(option => option
             .setName('reason')
             .setDescription('Reason why timeout is being applied')
+            .setMinLength(4)
             .setMaxLength(1000)
             .setRequired(true)
         )
