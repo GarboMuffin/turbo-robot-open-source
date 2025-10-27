@@ -211,26 +211,32 @@ const userLeave = async (member) => {
 };
 
 const auditLogs = async (auditLog) => {
-  let log = {
-    allowedMentions: { parse: [] }
-  };
+  let log = '';
   let isImportant = false;
 
   switch (auditLog.action) {
     case AuditLogEvent.MemberBanAdd:
-      log.content = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      log = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
       isImportant = true;
       break;
     case AuditLogEvent.MemberBanRemove:
-      log.content = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
+      log = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
       isImportant = true;
       break;
     case AuditLogEvent.MemberKick:
-      log.content = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      log = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
       isImportant = true;
       break;
+    case AuditLogEvent.MemberUpdate:
+      const timeoutInfo = auditLog.changes.find(i => i.key === 'communication_disabled_until');
+      if (timeoutInfo) {
+        const timeoutExpires = Math.round(Date.parse(timeoutInfo.new) / 1000);
+        log = `⏲️ <@${auditLog.targetId}> was timed out by <@${auditLog.executorId}> until <t:${timeoutExpires}:R> because: ${auditLog.reason || '???'}`
+        isImportant = true;
+      }
+      break;
     case AuditLogEvent.InviteCreate:
-      log.content = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
+      log = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
         auditLog.target.maxUses === 0 ? 'no limit' : `${auditLog.target.maxUses} max use(s)`} and ${
         auditLog.target.maxAge === 0 ? 'no expiration' : `expires in ${
           auditLog.target.maxAge < 86400 ? `${
@@ -241,13 +247,18 @@ const auditLogs = async (auditLog) => {
         }`;
       break;
     case AuditLogEvent.InviteDelete:
-      log.content = `🔗 <@${auditLog.executorId}> deleted an invite \`${auditLog.target.code}\``;
+      log = `🔗 <@${auditLog.executorId}> deleted an invite \`${auditLog.target.code}\``;
       break;
   }
 
-  if (log.content) {
+  if (log) {
     const logChannel = await client.channels.fetch(isImportant ? config.modChannelId : config.logChannelId);
-    await logChannel.send(log);
+    await logChannel.send({
+      content: log,
+      allowedMentions: {
+        parse: []
+      }
+    });
   }
 };
 
