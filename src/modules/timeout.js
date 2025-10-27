@@ -25,7 +25,7 @@ const timeout = async (interaction) => {
   }
 
   try {
-    await member.timeout(amount * 60000, reason);
+    await member.timeout(amount * 60000, `${interaction.user.username} - ${reason}`);
   } catch (error) {
     console.error(error);
     await interaction.editReply({
@@ -38,7 +38,14 @@ const timeout = async (interaction) => {
   let sentMessage = false;
   try {
     await user.send({
-      content: `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`
+      content: [
+        `⏲️ You have been timed out in the Turbowarp server for the following reason: ${reason}`,
+        ``,
+        `If you disagree or have any questions, you can either:`,
+        `1. Wait for the timeout to expire then open a ticket, or`,
+        `2. Reply to this message and it will be seen by a moderator (but edits may not be seen)`,
+        `⚠️⚠️ Messages sent in any other way will result in an extended timeout. No exceptions. ⚠️⚠️`
+      ].join('\n')
     });
     sentMessage = true;
   } catch (error) {
