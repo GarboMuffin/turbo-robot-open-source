@@ -211,20 +211,23 @@ const userLeave = async (member) => {
 };
 
 const auditLogs = async (auditLog) => {
-  const logChannel = await client.channels.fetch(config.logChannelId);
-
   let log = {
     allowedMentions: { parse: [] }
   };
+  let isImportant = false;
+
   switch (auditLog.action) {
     case AuditLogEvent.MemberBanAdd:
       log.content = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      isImportant = true;
       break;
     case AuditLogEvent.MemberBanRemove:
       log.content = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
+      isImportant = true;
       break;
     case AuditLogEvent.MemberKick:
       log.content = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}>${auditLog.reason ? ` for reason: \`${auditLog.reason}\`` : ''}`;
+      isImportant = true;
       break;
     case AuditLogEvent.InviteCreate:
       log.content = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
@@ -243,6 +246,7 @@ const auditLogs = async (auditLog) => {
   }
 
   if (log.content) {
+    const logChannel = await client.channels.fetch(isImportant ? config.modChannelId : config.logChannelId);
     await logChannel.send(log);
   }
 };
