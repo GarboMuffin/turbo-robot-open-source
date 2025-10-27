@@ -108,6 +108,7 @@ const commands = [
             .setName('time')
             .setDescription('How long to ignore DMs for')
             .addChoices(
+                { name: '0 seconds (unmutes)', value: 0 },
                 { name: '1 day', value: 1440 },
                 { name: '2 days', value: 2880 },
                 { name: '3 days', value: 4320 },

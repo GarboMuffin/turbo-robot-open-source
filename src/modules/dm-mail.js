@@ -86,13 +86,19 @@ const handleMuteDirectMessage = async (interaction) => {
   }
 
   const timeMinutes = interaction.options.getInteger('time') ?? 1440;
-  const endUnixMilliseconds = Date.now() + timeMinutes * 60 * 1000;
-  const endUnixSeconds = Math.round(endUnixMilliseconds / 1000);
-  mutes.set(user.id, endUnixMilliseconds);
-
-  await interaction.reply({
-    content: `Muted DMs from ${user} until <t:${endUnixSeconds}:R> (resets upon server restart)`
-  });
+  if (timeMinutes > 0) {
+    const endUnixMilliseconds = Date.now() + timeMinutes * 60 * 1000;
+    const endUnixSeconds = Math.round(endUnixMilliseconds / 1000);
+    mutes.set(user.id, endUnixMilliseconds);
+    await interaction.reply({
+      content: `Muted DMs from ${user} until <t:${endUnixSeconds}:R> (also resets upon server restart)`
+    });
+  } else {
+    mutes.delete(user.id);
+    await interaction.reply({
+      content: `Unmuted DMs from ${user}`
+    });
+  }
 };
 
 module.exports = {
