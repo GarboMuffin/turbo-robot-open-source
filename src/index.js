@@ -117,6 +117,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             case 'botdm':
                 await dmMail.handleSendDirectMessage(interaction);
                 break;
+            case 'mutedm':
+                await dmMail.handleMuteDirectMessage(interaction);
+                break;
             case 'Report User':
                 await contactMods.reportUser(interaction);
                 break;

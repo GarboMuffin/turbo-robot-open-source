@@ -96,6 +96,26 @@ const commands = [
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .setContexts(InteractionContextType.Guild),
+    new SlashCommandBuilder()
+        .setName('mutedm')
+        .setDescription('Temporarily ignore DMs from a specific user')
+        .addUserOption(option => option
+            .setName('user')
+            .setDescription('The user to ignore')
+            .setRequired(true)
+        )
+        .addIntegerOption(option => option
+            .setName('time')
+            .setDescription('How long to ignore DMs for')
+            .addChoices(
+                { name: '1 day', value: 1440 },
+                { name: '2 days', value: 2880 },
+                { name: '3 days', value: 4320 },
+                { name: '1 week', value: 10080 }
+            )
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+        .setContexts(InteractionContextType.Guild),
     /*
     new SlashCommandBuilder()
         .setName('slowmode')
