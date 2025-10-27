@@ -29,7 +29,7 @@ const thread = require('./modules/thread');
 const logging = require('./modules/logging');
 const slowmode = require('./modules/slowmode');
 const timeout = require('./modules/timeout');
-const autoresponder = require('./modules/autoresponder');
+const dmMail = require('./modules/dm-mail');
 const bigBrother = tryRequire('./modules/big-brother');
 
 client.once(Events.ClientReady, (client) => {
@@ -59,7 +59,7 @@ client.on(Events.MessageCreate, async (message) => {
 
         if (bigBrother) await bigBrother.checkThoughtcrime(message);
 
-        await autoresponder.autorespond(message);
+        await dmMail.handleDirectMessage(message);
     } catch (e) {
         console.error(e);
     }
