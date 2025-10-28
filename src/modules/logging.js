@@ -265,7 +265,7 @@ const auditLogs = async (auditLog) => {
   }
 
   if (unimportantLog) {
-    const channel = await client.channels.fetch(config.modChannelId);
+    const channel = await client.channels.fetch(config.logChannelId);
     await channel.send({
       content: unimportantLog,
       allowedMentions: {
