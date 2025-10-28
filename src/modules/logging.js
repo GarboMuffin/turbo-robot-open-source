@@ -7,6 +7,10 @@ const { unifiedDiff } = require('difflib');
 const client = require('../client');
 const config = require('../../config');
 
+const NOT_VERY_IMPORTANT = 0;
+const SOMEWHAT_IMPORTANT = 1;
+const EXTREMELY_IMPORTANT = 2;
+
 const editedMessage = async (oldMessage, newMessage) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
@@ -212,7 +216,7 @@ const userLeave = async (member) => {
 
 const auditLogs = async (auditLog) => {
   let log = '';
-  let isImportant = false;
+  let importantance = NOT_VERY_IMPORTANT;
 
   switch (auditLog.action) {
     case AuditLogEvent.MemberBanAdd:
@@ -230,9 +234,14 @@ const auditLogs = async (auditLog) => {
     case AuditLogEvent.MemberUpdate:
       const timeoutInfo = auditLog.changes.find(i => i.key === 'communication_disabled_until');
       if (timeoutInfo) {
-        const timeoutExpires = Math.round(Date.parse(timeoutInfo.new) / 1000);
-        log = `⏲️ <@${auditLog.targetId}> was timed out by <@${auditLog.executorId}> until <t:${timeoutExpires}:R> because: ${auditLog.reason || '???'}`
         isImportant = true;
+        if (timeoutInfo.new) {
+          const expiresUnixSeconds = Math.round(Date.parse(timeoutInfo.new) / 1000);
+          const durationMinutes = Math.round((expiresUnixSeconds - Date.now() / 1000) / 60);
+          log = `⏲️ <@${auditLog.targetId}> was timed out by <@${auditLog.executorId}> until <t:${expiresUnixSeconds}:f> (${durationMinutes} minutes) because: ${auditLog.reason || '???'}`;
+        } else {
+          log = `⏲️ <@${auditLog.targetId}> was untimed out by <@${auditLog.executorId}>`;
+        }
       }
       break;
     case AuditLogEvent.InviteCreate:
