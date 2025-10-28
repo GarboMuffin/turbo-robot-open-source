@@ -14,7 +14,6 @@ const handleDirectMessage = async (message) => {
       return;
     }
 
-    const modChannel = await client.channels.fetch(modChannelId);
     const modMessage = {
       content: `Received a DM from ${author}:\n\`\`\`\n${message.content.replace(/```/g, '[code block]')}\n\`\`\`Use \`/botdm user:${author.id} message:\` to reply, \`/mutedm user:${author.id} time:\` to mute`,
       files: message.attachments.map(i => ({
@@ -22,8 +21,25 @@ const handleDirectMessage = async (message) => {
         attachment: i.url
       }))
     };
+    const modChannel = await client.channels.fetch(modChannelId);
 
-    await modChannel.send(modMessage);
+    try {
+      await modChannel.send(modMessage);
+    } catch (e1) {
+      console.error(e1);
+
+      try {
+        // Try without attachments?
+        modMessage.content += '\n**[Attachments too large]**';
+        modMessage.files = [];
+        await modChannel.send(modMessage);
+        await message.reply('Your message was sent, but the attachments were too large so they were skipped');
+      } catch (e2) {
+        // ???
+        console.error(e2);
+        await message.reply('Something went wrong sending your message to moderators');
+      }
+    }
   }
 };
 
