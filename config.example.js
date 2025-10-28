@@ -29,6 +29,9 @@ module.exports = {
     // copy and paste its ID here as a string.
     starboardChannelId: 'right click on the channel > copy id',
 
+    // Create a webhook to post extremely important events, then put the URL here
+    majorOffensesSignalingService: 'https://discord.com/api/webhooks/...',
+
     // Path to folder to save database in. Leave it empty to save it in the same
     // folder as the source code, which is fine for development (it is gitignored).
     // In production we recommend reading mount-encrypted-storage.example.sh.

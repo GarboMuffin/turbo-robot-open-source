@@ -7,10 +7,6 @@ const { unifiedDiff } = require('difflib');
 const client = require('../client');
 const config = require('../../config');
 
-const NOT_VERY_IMPORTANT = 0;
-const SOMEWHAT_IMPORTANT = 1;
-const EXTREMELY_IMPORTANT = 2;
-
 const editedMessage = async (oldMessage, newMessage) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
 
@@ -215,37 +211,35 @@ const userLeave = async (member) => {
 };
 
 const auditLogs = async (auditLog) => {
-  let log = '';
-  let importantance = NOT_VERY_IMPORTANT;
+  let unimportantLog = '';
+  let importantLog = '';
+  let webhookLog = '';
 
   switch (auditLog.action) {
     case AuditLogEvent.MemberBanAdd:
-      log = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
-      isImportant = true;
+      importantLog = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
+      webhookLog = `<@${auditLog.targetId}> (${auditLog.targetId} / ${auditLog.target.username}) was banned by ${auditLog.executor.username} (${auditLog.executorId}) because: ${auditLog.reason || '???'}`;
       break;
     case AuditLogEvent.MemberBanRemove:
-      log = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
-      isImportant = true;
+      importantLog = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
       break;
     case AuditLogEvent.MemberKick:
-      log = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
-      isImportant = true;
+      importantLog = `👢 <@${auditLog.targetId}> was kicked by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
       break;
     case AuditLogEvent.MemberUpdate:
       const timeoutInfo = auditLog.changes.find(i => i.key === 'communication_disabled_until');
       if (timeoutInfo) {
-        isImportant = true;
         if (timeoutInfo.new) {
           const expiresUnixSeconds = Math.round(Date.parse(timeoutInfo.new) / 1000);
           const durationMinutes = Math.round((expiresUnixSeconds - Date.now() / 1000) / 60);
-          log = `⏲️ <@${auditLog.targetId}> was timed out by <@${auditLog.executorId}> until <t:${expiresUnixSeconds}:f> (${durationMinutes} minutes) because: ${auditLog.reason || '???'}`;
+          importantLog = `⏲️ <@${auditLog.targetId}> was timed out by <@${auditLog.executorId}> until <t:${expiresUnixSeconds}:f> (${durationMinutes} minutes) because: ${auditLog.reason || '???'}`;
         } else {
-          log = `⏲️ <@${auditLog.targetId}> was untimed out by <@${auditLog.executorId}>`;
+          importantLog = `⏲️ <@${auditLog.targetId}> was untimed out by <@${auditLog.executorId}>`;
         }
       }
       break;
     case AuditLogEvent.InviteCreate:
-      log = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
+      unimportantLog = `🔗 <@${auditLog.executorId}> created a${auditLog.target.temporary ? ' temporary' : 'n'} invite \`${auditLog.target.code}\` with ${
         auditLog.target.maxUses === 0 ? 'no limit' : `${auditLog.target.maxUses} max use(s)`} and ${
         auditLog.target.maxAge === 0 ? 'no expiration' : `expires in ${
           auditLog.target.maxAge < 86400 ? `${
@@ -256,17 +250,39 @@ const auditLogs = async (auditLog) => {
         }`;
       break;
     case AuditLogEvent.InviteDelete:
-      log = `🔗 <@${auditLog.executorId}> deleted an invite \`${auditLog.target.code}\``;
+      unimportantLog = `🔗 <@${auditLog.executorId}> deleted an invite \`${auditLog.target.code}\``;
       break;
   }
 
-  if (log) {
-    const logChannel = await client.channels.fetch(isImportant ? config.modChannelId : config.logChannelId);
-    await logChannel.send({
-      content: log,
+  if (importantLog) {
+    const channel = await client.channels.fetch(config.modChannelId);
+    await channel.send({
+      content: importantLog,
       allowedMentions: {
         parse: []
       }
+    });
+  }
+
+  if (unimportantLog) {
+    const channel = await client.channels.fetch(config.modChannelId);
+    await channel.send({
+      content: unimportantLog,
+      allowedMentions: {
+        parse: []
+      }
+    });
+  }
+
+  if (webhookLog && config.majorOffensesSignalingService) {
+    await fetch(config.majorOffensesSignalingService, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        content: webhookLog
+      })
     });
   }
 };
