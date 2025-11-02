@@ -218,7 +218,7 @@ const auditLogs = async (auditLog) => {
   switch (auditLog.action) {
     case AuditLogEvent.MemberBanAdd:
       importantLog = `🔨 <@${auditLog.targetId}> was banned by <@${auditLog.executorId}> because: ${auditLog.reason || '???'}`;
-      webhookLog = `<@${auditLog.targetId}> (${auditLog.targetId} / ${auditLog.target.username}) was banned by ${auditLog.executor.username} (${auditLog.executorId}) because: ${auditLog.reason || '???'}`;
+      webhookLog = `<@${auditLog.targetId}> (${auditLog.targetId} / ${auditLog.target?.username}) was banned by ${auditLog.executor?.username} (${auditLog.executorId}) because: ${auditLog.reason || '???'}`;
       break;
     case AuditLogEvent.MemberBanRemove:
       importantLog = `🔨 <@${auditLog.targetId}> was unbanned by <@${auditLog.executorId}>`;
