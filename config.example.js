@@ -17,6 +17,10 @@ module.exports = {
     // copy and paste its ID here as a string.
     modChannelId: 'right click on the channel > copy id',
 
+    // Create a channel for admin stuff, then
+    // copy and paste its ID here as a string.
+    adminChannelId: 'right click on the channel > copy id',
+
     // Create a channel for logging, then
     // copy and paste its ID here as a string.
     logChannelId: 'right click on the channel > copy id',

@@ -13,6 +13,7 @@ const editedMessage = async (oldMessage, newMessage) => {
   if (
     newMessage.channel instanceof DMChannel ||
     newMessage.channel.id === config.modChannelId ||
+    newMessage.channel.id === config.adminChannelId ||
     newMessage.channel.id === config.logChannelId ||
     newMessage.channel.id === config.starboardChannelId ||
     oldMessage.partial ||
@@ -71,6 +72,7 @@ const deletedMessage = async (message) => {
   if (
     message.channel instanceof DMChannel ||
     message.channel.id === config.modChannelId ||
+    message.channel.id === config.adminChannelId ||
     message.channel.id === config.logChannelId ||
     message.channel.id === config.starboardChannelId
   ) {
