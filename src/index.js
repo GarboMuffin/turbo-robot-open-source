@@ -34,10 +34,6 @@ const bigBrother = tryRequire('./modules/big-brother');
 
 client.once(Events.ClientReady, (client) => {
     console.log(`Logged in as ${client.user.tag}`);
-    client.user.setActivity({
-        type: ActivityType.Watching,
-        name: 'for thoughtcrime committers'
-    });
 });
 
 let invites;
