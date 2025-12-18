@@ -93,11 +93,11 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    let content = message.content
+    let content = message.content;
     if (message.messageSnapshots.size > 0) {
-        content = `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}`
+        content = `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}`;
     } else if (message.poll) {
-        content = `-# *Poll*\n${message.poll.question.text}`
+        content = `-# *Poll*\n${message.poll.question.text}`;
         let answers = message.poll.answers.map(answer => answer);
         for (let i = 0; i < answers.length; i++) {
             content += `\n${message.poll.allowMultiselect ? "☐" : "◯"} `;
