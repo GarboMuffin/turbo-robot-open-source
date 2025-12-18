@@ -79,7 +79,7 @@ const stringifyMessageContent = (message) => {
             case MessageType.GuildBoostTier3:
                 return 'Boosted the server and made it reach level 3';
             case MessageType.PollResult:
-                return 'Poll ended';
+                return `Poll ended with ${message.embeds[0].data.fields[4] ? "winner: " + message.embeds[0].data.fields[4].value : "no winner"}`;
             case MessageType.ChannelPinnedMessage:
                 return 'Pinned a message to this channel';
             case MessageType.ThreadCreated:
@@ -93,7 +93,26 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    return message.messageSnapshots.size > 0 ? `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}` : message.content;
+    let content = message.content
+    if (message.messageSnapshots.size > 0) {
+        content = `-# *↱ Forwarded message:*\n${message.messageSnapshots.first().content}`
+    } else if (message.poll) {
+        content = `-# *Poll*\n${message.poll.question.text}`
+        let answers = message.poll.answers.map(answer => answer);
+        for (let i = 0; i < answers.length; i++) {
+            content += `\n${message.poll.allowMultiselect ? "☐" : "◯"} `;
+            if (answers[i].emoji) {
+            if (answers[i].emoji && answers[i].emoji.id) {
+                content += `:${answers[i].emoji.name}: `;
+            } else if (answers[i].emoji) {
+                content += answers[i].emoji.name + " ";
+            } 
+            }
+            content += answers[i].text;
+        }
+    }
+
+    return content
 };
 
 /**
