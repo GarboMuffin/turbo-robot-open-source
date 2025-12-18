@@ -109,7 +109,7 @@ const deletedMessage = async (message) => {
         }
         content += answers[i].text;
       }
-      if (poll.results) {
+      if (poll.resultsFinalized) {
         content += `\nPoll closed`;
       } else {
         content += `\nPoll open`;
@@ -125,7 +125,11 @@ const deletedMessage = async (message) => {
       if (embed.fields[3]) {
         content += `\nWinner: "${embed.fields[4].value}" with ${embed.fields[1].value} votes`;
       } else {
-        content += `\nThere was no winner`;
+        if (embed.fields[2].value > 0) {
+          content += `\nThe results were tied`;
+        } else {
+          content += `\nThere was no winner`;
+        }
       }
     }
     if (content.length <= 250) {
