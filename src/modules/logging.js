@@ -91,7 +91,43 @@ const deletedMessage = async (message) => {
     }));
   }
   if (!message.partial) {
-    content = message.messageSnapshots.first() ? message.messageSnapshots.first().content : message.content;
+    let content = message.content;
+    if (message.messageSnapshots.first()) {
+      content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
+    } else if (message.poll) {
+      let poll = message.poll;
+      content = `[Poll]\n\n${poll.question.text}`
+      let answers = poll.answers.map(answer => answer);
+      for (let i = 0; i < answers.length; i++) {
+        content += `\n${poll.allowMultiselect ? "☐" : "◯"} `;
+        if (answers[i].emoji) {
+          if (answers[i].emoji && answers[i].emoji.id) {
+            content += `:${answers[i].emoji.name}: `;
+          } else if (answers[i].emoji) {
+            content += answers[i].emoji.name + " ";
+          } 
+        }
+        content += answers[i].text;
+      }
+      if (poll.results) {
+        content += `\nPoll closed`;
+      } else {
+        content += `\nPoll open`;
+      }
+    } else if (message.embeds[0] && message.embeds[0].data.type == "poll_result") {
+      embed = message.embeds[0].data;
+      content = `[Poll Result]\n\n"${embed.fields[0].value}" results:\nTotal votes: ${embed.fields[2].value}`;
+      if (embed.fields[6]) {
+        content += `:${embed.fields[6].value}: `;
+      } else if (embed.fields[5]) {
+        content += embed.fields[5].value + " ";
+      }
+      if (embed.fields[3]) {
+        content += `\nWinner: "${embed.fields[4].value}" with ${embed.fields[1].value} votes`;
+      } else {
+        content += `\nThere was no winner`;
+      }
+    }
     if (content.length <= 250) {
       log.content += `\n\`\`\`\n${content}\n\`\`\``;
     } else {
