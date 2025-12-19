@@ -1,9 +1,11 @@
 const {
   AttachmentBuilder,
   AuditLogEvent,
-  DMChannel
+  DMChannel,
+  MessageType
 } = require('discord.js');
 const { unifiedDiff } = require('difflib');
+const { stringifyMessageContent } = require('./star-board.js')
 const client = require('../client');
 const config = require('../../config');
 
@@ -90,10 +92,11 @@ const deletedMessage = async (message) => {
       attachment: attachment.url
     }));
   }
+  
   if (!message.partial) {
     let content = message.content;
     if (message.messageSnapshots.first()) {
-      content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
+        content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
     } else if (message.poll) {
       let poll = message.poll;
       content = `[Poll]\n\n${poll.question.text}`
@@ -114,7 +117,7 @@ const deletedMessage = async (message) => {
       } else {
         content += `\nPoll open`;
       }
-    } else if (message.embeds[0] && message.embeds[0].data.type == "poll_result") {
+    } else if (message.embeds[0] && message.type == MessageType.PollResult) {
       embed = message.embeds[0].data;
       content = `[Poll Result]\n\n"${embed.fields[0].value}" results:\nTotal votes: ${embed.fields[2].value}`;
       if (embed.fields[6]) {
@@ -131,7 +134,10 @@ const deletedMessage = async (message) => {
           content += `\nThere was no winner`;
         }
       }
+    } else {
+      content = "[" + stringifyMessageContent(message) + "]";
     }
+
     if (content.length <= 250) {
       log.content += `\n\`\`\`\n${content}\n\`\`\``;
     } else {
@@ -146,6 +152,66 @@ const deletedMessage = async (message) => {
 
   await logChannel.send(log);
 };
+
+const onReactionRemove = async (reaction, user) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+  await reaction.fetch();
+
+  let log = {
+    content: `🔬 `,
+    allowedMentions: { parse: [] }
+  };
+
+  if (reaction.emoji.id) {
+    if (reaction.emoji.guildId === reaction.message.guild.id) {
+      log.content += `<:${reaction.emoji.name}:${reaction.emoji.id}>`;
+    } else {
+      log.content += `[${reaction.emoji.name}](https://cdn.discordapp.com/emojis/${reaction.emoji.id}.gif?size=48&animated=${reaction.emoji.animated}&name=${reaction.emoji.name})`;
+    }
+  } else {
+    log.content += reaction.emoji.name;
+  }
+
+  log.content += ` was unreacted from [Message](${reaction.message.url}) by <@${user.id}> in ${reaction.message.channel.url}`;
+
+  await logChannel.send(log);
+}
+
+const onReactionRemovedByModerator = async (reaction) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+  await reaction.fetch();
+
+  let log = {
+    content: `🦠 `,
+    allowedMentions: { parse: [] }
+  };
+
+  if (reaction.emoji.id) {
+    if (reaction.emoji.guildId === reaction.message.guild.id) {
+      log.content += `<:${reaction.emoji.name}:${reaction.emoji.id}>`;
+    } else {
+      log.content += `[${reaction.emoji.name}](https://cdn.discordapp.com/emojis/${reaction.emoji.id}.gif?size=48&animated=${reaction.emoji.animated}&name=${reaction.emoji.name})`;
+    }
+  } else {
+    log.content += reaction.emoji.name;
+  }
+
+  log.content += ` reaction was removed from [Message](${reaction.message.url}) by moderators in ${reaction.message.channel.url}`;
+
+  await logChannel.send(log);
+}
+
+const onAllReactionsRemovedByModerator = async (message) => {
+  const logChannel = await client.channels.fetch(config.logChannelId);
+  await message.fetch();
+
+  let log = {
+    content: `🧼 All reactions removed from [Message](${message.url}) by moderators in ${message.channel.url}`,
+    allowedMentions: { parse: [] }
+  };
+
+  await logChannel.send(log);
+}
 
 const purgedMessages = async (messages, channelUrl) => {
   const logChannel = await client.channels.fetch(config.logChannelId);
@@ -332,6 +398,9 @@ const auditLogs = async (auditLog) => {
 module.exports = {
   editedMessage,
   deletedMessage,
+  onReactionRemove,
+  onReactionRemovedByModerator,
+  onAllReactionsRemovedByModerator,
   purgedMessages,
   voiceChat,
   userJoin,

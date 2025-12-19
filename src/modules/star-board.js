@@ -233,5 +233,6 @@ const onEditMessage = async (message) => {
 module.exports = {
     onReaction,
     onDeleteMessage,
-    onEditMessage
+    onEditMessage,
+    stringifyMessageContent
 };
