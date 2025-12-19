@@ -1,9 +1,11 @@
 const {
   AttachmentBuilder,
   AuditLogEvent,
-  DMChannel
+  DMChannel,
+  MessageType
 } = require('discord.js');
 const { unifiedDiff } = require('difflib');
+const { stringifyMessageContent } = require('./star-board.js')
 const client = require('../client');
 const config = require('../../config');
 
@@ -90,10 +92,11 @@ const deletedMessage = async (message) => {
       attachment: attachment.url
     }));
   }
+  
   if (!message.partial) {
     let content = message.content;
     if (message.messageSnapshots.first()) {
-      content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
+        content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
     } else if (message.poll) {
       let poll = message.poll;
       content = `[Poll]\n\n${poll.question.text}`
@@ -114,7 +117,7 @@ const deletedMessage = async (message) => {
       } else {
         content += `\nPoll open`;
       }
-    } else if (message.embeds[0] && message.embeds[0].data.type == "poll_result") {
+    } else if (message.embeds[0] && message.type == MessageType.PollResult) {
       embed = message.embeds[0].data;
       content = `[Poll Result]\n\n"${embed.fields[0].value}" results:\nTotal votes: ${embed.fields[2].value}`;
       if (embed.fields[6]) {
@@ -131,7 +134,10 @@ const deletedMessage = async (message) => {
           content += `\nThere was no winner`;
         }
       }
+    } else {
+      content = "[" + stringifyMessageContent(message) + "]";
     }
+
     if (content.length <= 250) {
       log.content += `\n\`\`\`\n${content}\n\`\`\``;
     } else {
