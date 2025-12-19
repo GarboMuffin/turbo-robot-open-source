@@ -152,7 +152,7 @@ const onReactionRemove = async (reaction, user) => {
   await reaction.fetch();
 
   let log = {
-    content: `➖ `,
+    content: `🔬 `,
     allowedMentions: { parse: [] }
   };
 
@@ -176,7 +176,7 @@ const onReactionRemovedByModerator = async (reaction) => {
   await reaction.fetch();
 
   let log = {
-    content: `➖ `,
+    content: `🦠 `,
     allowedMentions: { parse: [] }
   };
 
@@ -200,7 +200,7 @@ const onAllReactionsRemovedByModerator = async (message) => {
   await message.fetch();
 
   let log = {
-    content: `➖ All reactions removed from [Message](${message.url}) by moderators in ${message.channel.url}`,
+    content: `🧼 All reactions removed from [Message](${message.url}) by moderators in ${message.channel.url}`,
     allowedMentions: { parse: [] }
   };
 
