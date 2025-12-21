@@ -15,7 +15,7 @@ const {
 const commands = [
     new SlashCommandBuilder()
         .setName('contactmods')
-        .setDescription('Contact moderators without posting a public message (previously /pingmods)')
+        .setDescription('Contact moderators without posting a public message')
         .addStringOption(option => option
             .setName('topic')
             .setDescription('What are you contacting us about?')
@@ -64,6 +64,14 @@ const commands = [
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .setContexts(InteractionContextType.Guild),
+    new SlashCommandBuilder()
+        .setName('pingmods')
+        .setDescription('Ping moderators without posting a public message')
+        .addStringOption(option => option
+            .setName('reason')
+            .setDescription('Message will be provided to moderators.')
+            .setMaxLength(1000)
+        ),
     new SlashCommandBuilder()
         .setName('purge')
         .setDescription('Purge messages in the current channel')
