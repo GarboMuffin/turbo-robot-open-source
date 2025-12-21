@@ -95,6 +95,9 @@ const deletedMessage = async (message) => {
   
   if (!message.partial) {
     let content = message.content;
+
+    content = content.replace(/```/g, "\\`\\`\\`");
+
     if (message.messageSnapshots.first()) {
         content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
     } else if (message.poll) {
@@ -134,7 +137,7 @@ const deletedMessage = async (message) => {
           content += `\nThere was no winner`;
         }
       }
-    } else {
+    } else if (message.system) {
       content = "[" + stringifyMessageContent(message) + "]";
     }
 
