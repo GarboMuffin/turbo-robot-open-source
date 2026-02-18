@@ -3,53 +3,23 @@ const client = require('../client');
 const db = require('../db');
 const config = require('../../config');
 
-db.exec(`
-CREATE TABLE IF NOT EXISTS starboard (
-    original_message_id TEXT NOT NULL UNIQUE,
-    -- -1 means "not posted"
-    -- >0 is a message ID
-    starboard_message_id TEXT NOT NULL,
-    count INT NOT NULL
-);`);
-db.exec('CREATE INDEX IF NOT EXISTS starboard_original_message_id_index ON starboard (original_message_id);');
-
-const _addNewMessage = db.prepare(`
-INSERT OR IGNORE INTO starboard (
-    original_message_id,
-    starboard_message_id,
-    count
-) VALUES (?, -1, 0);`);
-const _getMessage = db.prepare('SELECT starboard_message_id, count FROM starboard WHERE original_message_id = ?;');
-const _setStarboardMessageId = db.prepare('UPDATE starboard SET starboard_message_id = ? WHERE original_message_id = ?;');
-const _setCount = db.prepare('UPDATE starboard SET count = ? WHERE original_message_id = ?');
-
-const EMOJI = '🍡';
-const THRESHOLD = 7;
-const COLORS = [
-    0xfcb1e3,
-    0xfed983,
-    0xa6d387
-];
-
 const isPublicChannel = (channel) => {
-    if (channel instanceof DMChannel) {
-        return false;
-    }
+    if (channel instanceof DMChannel) return false;
 
     const DISABLED_CHANNELS = [
         config.starboardChannelId,
         '1100160429382193193', // #updates
         '901247658096754709', // #readme
+        '1046570476417323049', // #secreter-zone
+        '1150269777370165310', // #secretest-zone
+        '1394080368457682995', // #secret-zone
+        '1385119001964974120', // #wayback-machine
+        '1391383839359762533', // #mod-applications
 
-        // mod channels; they should already be excluded by below checks but just to be safe...
-        '1046570476417323049',
-        '1150269777370165310',
-        '1349407494501568603',
+        '1349407494501568603', // ?? Deleted channels, most likely old wayback machines
         '1349407854108479528',
     ];
-    if (DISABLED_CHANNELS.includes(channel.id)) {
-        return false;
-    }
+    if (DISABLED_CHANNELS.includes(channel.id)) return false;
 
     const guild = channel.guild;
     const everyone = guild.roles.everyone;
@@ -85,7 +55,7 @@ const stringifyMessageContent = (message) => {
             case MessageType.ThreadCreated:
                 return 'Created a thread';
             case MessageType.RecipientAdd:
-                return `Added <@${message.mentions.users.first().id}> to a thread`;   
+                return `Added <@${message.mentions.users.first().id}> to a thread`;
             case MessageType.RecipientRemove:
                 return `Removed <@${message.mentions.users.first().id}> from a thread`;
             default:
@@ -112,127 +82,180 @@ const stringifyMessageContent = (message) => {
         }
     }
 
-    return content
+    return content;
 };
 
-/**
- * @param {import('discord.js').Message} message
- */
-const updateMessage = async (message) => {
-    await message.fetch();
-    const starboardChannel = await client.channels.fetch(config.starboardChannelId);
+class Board {
+    constructor(options) {
+        this.name = options.name;
+        this.table = options.table;
+        this.emoji = options.emoji;
+        this.threshold = options.threshold;
+        this.colors = options.colors;
+        this.channelId = options.channelId ?? config.starboardChannelId;
 
-    const startingMessage = _getMessage.get(message.id);
-    const messageContent = stringifyMessageContent(message);
-    const embedMessage = {
-        allowedMentions: {},
-        content: `${EMOJI} **${startingMessage.count}** - ${message.url} (<@${message.author.id}>)`,
-        embeds: [
-            {
-                color: COLORS[BigInt(message.id) % BigInt(COLORS.length)],
-                author: {
-                    name: message.author.displayName,
-                    url: message.url,
-                    icon_url: message.author.displayAvatarURL()
-                },
-                ...(messageContent ? { description: messageContent } : {}),
-                timestamp: new Date(message.createdTimestamp).toISOString()
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS ${this.table} (
+                original_message_id TEXT NOT NULL UNIQUE,
+                starboard_message_id TEXT NOT NULL,
+                count INT NOT NULL
+            );
+        `);
+        db.exec(`CREATE INDEX IF NOT EXISTS ${this.table}_index ON ${this.table} (original_message_id);`);
+
+        this.addNew = db.prepare(`
+            INSERT OR IGNORE INTO ${this.table} (
+                original_message_id,
+                starboard_message_id,
+                count
+            ) VALUES (?, -1, 0);
+        `);
+
+        this.get = db.prepare(`SELECT starboard_message_id, count FROM ${this.table} WHERE original_message_id = ?;`);
+        this.setId = db.prepare(`UPDATE ${this.table} SET starboard_message_id = ? WHERE original_message_id = ?;`);
+        this.setCount = db.prepare(`UPDATE ${this.table} SET count = ? WHERE original_message_id = ?;`);
+    }
+
+    isOnOtherBoard(messageId) {
+        if (!this.otherBoard) return false;
+        const row = this.otherBoard.get.get(messageId);
+        return row && BigInt(row.starboard_message_id) > 0;
+    }
+
+    async updateMessage(message) {
+        await message.fetch();
+        const boardChannel = await client.channels.fetch(this.channelId);
+
+        const starting = this.get.get(message.id);
+        const content = stringifyMessageContent(message);
+
+        const embedMessage = {
+            allowedMentions: {},
+            content: `${this.emoji} **${starting.count}** - ${message.url} (<@${message.author.id}>)`,
+            embeds: [
+                {
+                    color: this.colors[BigInt(message.id) % BigInt(this.colors.length)],
+                    author: {
+                        name: message.author.displayName,
+                        url: message.url,
+                        icon_url: message.author.displayAvatarURL()
+                    },
+                    ...(content ? { description: content } : {}),
+                    timestamp: new Date(message.createdTimestamp).toISOString()
+                }
+            ]
+        };
+
+        const attachments = message.messageSnapshots.size > 0
+            ? message.messageSnapshots.first().attachments
+            : message.attachments;
+
+        if (BigInt(starting.starboard_message_id) < 0) {
+            embedMessage.files = attachments.map(i => ({ name: i.name, attachment: i.url }));
+
+            const posted = await boardChannel.send(embedMessage);
+            this.setId.run(posted.id, message.id);
+
+            const ending = this.get.get(message.id);
+            if (BigInt(ending.starboard_message_id) < 0) {
+                await posted.delete();
+            } else if (ending.count !== starting.count) {
+                await this.updateMessage(message);
             }
-        ]
-    };
-
-    const attachments = message.messageSnapshots.size > 0 ? message.messageSnapshots.first().attachments : message.attachments;
-    if (BigInt(startingMessage.starboard_message_id) < 0) {
-        embedMessage.files = attachments.map(i => ({
-            name: i.name,
-            attachment: i.url
-        }));
-
-        // need to post the message for the first time
-        const starboardMessage = await starboardChannel.send(embedMessage);
-        _setStarboardMessageId.run(starboardMessage.id, message.id);
-
-        // check for race conditions
-        const endingMessage = _getMessage.get(message.id);
-        if (BigInt(endingMessage.starboard_message_id) < 0) {
-            // got deleted
-            await starboardMessage.delete();
-        } else if (endingMessage.count !== startingMessage.count) {
-            // new count
-            await updateMessage(message);
-        }
-    } else {
-        // message was already posted, just need to update it
-        const starboardMessage = await starboardChannel.messages.fetch(startingMessage.starboard_message_id);
-        // message could have been deleted
-        if (starboardMessage) {
-            await starboardMessage.edit(embedMessage);
+        } else {
+            const posted = await boardChannel.messages.fetch(starting.starboard_message_id).catch(() => null);
+            if (posted) await posted.edit(embedMessage);
         }
     }
-};
 
-const onReaction = async (reaction) => {
-    await reaction.fetch();
-    if (reaction.emoji.name !== EMOJI) {
-        return;
-    }
+    async onReaction(reaction) {
+        await reaction.fetch();
+        if (reaction.emoji.name !== this.emoji) return;
 
-    const message = reaction.message;
-    const existingMessage = _getMessage.get(message.id);
-    if (existingMessage) {
-        // only store the largest count
-        if (reaction.count > existingMessage.count) {
-            _setCount.run(reaction.count, message.id);
+        const message = reaction.message;
 
-            // if it hasn't been posted yet, don't do anything, the new count will be picked up automatically
-            // if the message is still valid
-            if (BigInt(existingMessage.starboard_message_id) > 0) {
-                await updateMessage(message);
+        if (this.isOnOtherBoard(message.id)) return;
+
+        const existing = this.get.get(message.id);
+        
+        if (existing) {
+            // only store the largest count
+            if (reaction.count > existing.count) {
+                this.setCount.run(reaction.count, message.id);
+                // if it hasn't been posted yet, don't do anything, the new count will be picked up automatically
+                // if the message is still valid
+                if (BigInt(existing.starboard_message_id) > 0) {
+                    await this.updateMessage(message);
+                }
             }
-        }
-    } else if (reaction.count >= THRESHOLD) {
-        _addNewMessage.run(message.id);
+        } else if (reaction.count >= this.threshold) {
+            this.addNew.run(message.id);
 
-        const channel = message.channel;
-        await channel.fetch();
-        if (!isPublicChannel(channel)) {
-            return;
-        }
+            const channel = message.channel;
+            await channel.fetch();
+            if (!isPublicChannel(channel)) return;
 
-        _setCount.run(reaction.count, message.id);
-        await updateMessage(message);
-    }
-};
-
-const onDeleteMessage = async (message) => {
-    // delete the starboard message if the original got deleted
-    const existingMessage = _getMessage.get(message.id);
-
-    if (existingMessage) {
-        _setStarboardMessageId.run(-1, message.id);
-
-        if (BigInt(existingMessage.starboard_message_id) > 0) {
-            const starboardChannel = await client.channels.fetch(config.starboardChannelId);
-            const toDelete = await starboardChannel.messages.fetch(existingMessage.starboard_message_id);
-            if (toDelete) {
-                await toDelete.delete();
-            }
+            this.setCount.run(reaction.count, message.id);
+            await this.updateMessage(message);
         }
     }
-};
 
-const onEditMessage = async (message) => {
-    const existingMessage = _getMessage.get(message.id);
-    if (existingMessage) {
-        if (BigInt(existingMessage.starboard_message_id) > 0) {
-            await updateMessage(message);
+    async onDeleteMessage(message) {
+        // delete the starboard message if the original got deleted
+        const existing = this.get.get(message.id);
+        if (!existing) return;
+
+        this.setId.run(-1, message.id);
+
+        if (BigInt(existing.starboard_message_id) > 0) {
+            const boardChannel = await client.channels.fetch(this.channelId);
+            const posted = await boardChannel.messages.fetch(existing.starboard_message_id).catch(() => null);
+            if (posted) await posted.delete();
         }
     }
-};
+
+    async onEditMessage(message) {
+        const existing = this.get.get(message.id);
+        if (existing && BigInt(existing.starboard_message_id) > 0) {
+            await this.updateMessage(message);
+        }
+    }
+}
+
+const starboard = new Board({
+    name: "starboard",
+    table: "starboard",
+    emoji: "🍡",
+    threshold: 7,
+    colors: [0xfcb1e3, 0xfed983, 0xa6d387],
+    channelId: config.starboardChannelId
+});
+
+const evilboard = new Board({
+    name: "evilboard",
+    table: "evilboard",
+    emoji: "🍢",
+    threshold: 7,
+    colors: [0xccd6dd, 0xd99e82, 0x66757f],
+    channelId: config.evilboardChannelId
+});
+
+starboard.otherBoard = evilboard;
+evilboard.otherBoard = starboard;
 
 module.exports = {
-    onReaction,
-    onDeleteMessage,
-    onEditMessage,
-    stringifyMessageContent
+    stringifyMessageContent,
+    onReaction: async (reaction) => {
+        await starboard.onReaction(reaction);
+        await evilboard.onReaction(reaction);
+    },
+    onDeleteMessage: async (message) => {
+        await starboard.onDeleteMessage(message);
+        await evilboard.onDeleteMessage(message);
+    },
+    onEditMessage: async (message) => {
+        await starboard.onEditMessage(message);
+        await evilboard.onEditMessage(message);
+    }
 };
+
