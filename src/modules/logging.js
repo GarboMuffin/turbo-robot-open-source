@@ -97,7 +97,7 @@ const deletedMessage = async (message) => {
     }));
   }
 
-  let content = message.content.replace(/```/g, "\\`\\`\\`");;
+  let content = message.content.replace(/```/g, "\\`\\`\\`");
 
   if (message.messageSnapshots.first()) {
       content = "↱ Forwarded message:\n" + message.messageSnapshots.first().content;
