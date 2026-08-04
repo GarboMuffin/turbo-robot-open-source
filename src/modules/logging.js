@@ -17,7 +17,6 @@ const getImageMetadataChange = (oldMessage, newMessage) => {
   const newAttachment = newMessage.attachments.first();
 
   if (!oldAttachment || !newAttachment) return null;
-  if (!newAttachment.contentType?.startsWith('image/')) return null;
 
   const changes = [];
   let altTextDiff = null;
@@ -88,7 +87,7 @@ const editedMessage = async (oldMessage, newMessage) => {
     log.content = `📝 Embeds ${newMessage.flags.has('SuppressEmbeds') ? 'removed from' : 'shown on'} [message](${newMessage.url}) by <@${newMessage.author.id}> in ${newMessage.channel.url} (\`${newMessage.id}\`)`;
     log.embeds = oldMessage.embeds;
   } else if (imageMetadata) {
-    let content = `🖼️ [Image](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url} (\`${newMessage.id}\`)`;
+    let content = `🖼️ [Attachment](${newMessage.url}) by <@${newMessage.author.id}> was edited in ${newMessage.channel.url} (\`${newMessage.id}\`)`;
     if (imageMetadata.spoilerChange) {
       content += `\n🫣 Spoiler was ${imageMetadata.spoilerChange}.`;
     }

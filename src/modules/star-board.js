@@ -253,7 +253,8 @@ evilboard.otherBoard = starboard;
 async function autoReact(message) {
     if (message.author.bot) return;
     if (!message.channel) return;
-    if ((message.messageSnapshots.first() && !message.messageSnapshots?.first()?.attachments.first()) && !message.attachments.first()) return;
+    if (message.messageSnapshots.first() && !message.messageSnapshots?.first()?.attachments.first()) return;
+    if (!message.messageSnapshots.first() && !message.attachments.first()) return;
 
     const channelIds = config.starboardAutoReactChannelIds ?? [];
     if (!channelIds.includes(message.channel.id)) return;
