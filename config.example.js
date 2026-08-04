@@ -33,6 +33,10 @@ module.exports = {
     // copy and paste its ID here as a string.
     starboardChannelId: 'right click on the channel > copy id',
 
+    // Create channels for the starboard to autoreact to media on, then
+    // copy and paste their IDs here as strings.
+    starboardAutoReactChannelIds: ['right click on the channel > copy id'],
+
     // Create a webhook to post extremely important events, then put the URL here
     majorOffensesSignalingService: 'https://discord.com/api/webhooks/...',
 
