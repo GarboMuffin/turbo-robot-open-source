@@ -233,7 +233,7 @@ const starboard = new Board({
     name: "starboard",
     table: "starboard",
     emoji: "🍡",
-    threshold: 1,
+    threshold: 7,
     colors: [0xfcb1e3, 0xfed983, 0xa6d387],
     channelId: config.starboardChannelId
 });
@@ -253,8 +253,7 @@ evilboard.otherBoard = starboard;
 async function autoReact(message) {
     if (message.author.bot) return;
     if (!message.channel) return;
-    if (!message.attachments.first()) return;
-    if (message.messageSnapshots.first() && !message.messageSnapshots?.first()?.attachments.first()) return;
+    if ((message.messageSnapshots.first() && !message.messageSnapshots?.first()?.attachments.first()) && !message.attachments.first()) return;
 
     const channelIds = config.starboardAutoReactChannelIds ?? [];
     if (!channelIds.includes(message.channel.id)) return;
