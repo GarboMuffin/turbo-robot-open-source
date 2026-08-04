@@ -55,6 +55,8 @@ client.on(Events.MessageCreate, async (message) => {
         if (bigBrother) await bigBrother.checkThoughtcrime(message);
 
         await dmMail.handleDirectMessage(message);
+
+        await starBoard.autoReact(message);
     } catch (e) {
         console.error(e);
     }
@@ -135,7 +137,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
     try {
-        await starBoard.onReaction(reaction);
+        await starBoard.onReaction(reaction, user);
     } catch (e) {
         console.error(e);
     }
