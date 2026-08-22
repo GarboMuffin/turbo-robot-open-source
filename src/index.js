@@ -91,7 +91,11 @@ metrics.on(Events.MessageDelete, async (message) => {
 });
 
 metrics.on(Events.VoiceStateUpdate, async (oldState, newState) => {
-    await logging.voiceChat(oldState, newState);
+    try {
+        await logging.voiceChat(oldState, newState);
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 metrics.on(Events.InteractionCreate, async (interaction) => {
