@@ -90,7 +90,11 @@ client.on(Events.MessageDelete, async (message) => {
 });
 
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
-    await logging.voiceChat(oldState, newState);
+    try {
+        await logging.voiceChat(oldState, newState);
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
