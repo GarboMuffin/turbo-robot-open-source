@@ -461,20 +461,15 @@ const auditLogs = async (auditLog) => {
   }
 
   if (webhookLog && config.majorOffensesSignalingService) {
-    try {
-      await fetch(config.majorOffensesSignalingService, {
-        method: 'POST',
-        signal: AbortSignal.timeout(10000),
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          content: webhookLog
-        })
-      });
-    } catch (error) {
-      console.error('Failed to send webhook:', error);
-    }
+    await fetch(config.majorOffensesSignalingService, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        content: webhookLog
+      })
+    });
   }
 };
 
