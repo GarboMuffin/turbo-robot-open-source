@@ -169,18 +169,30 @@ metrics.on(Events.MessageReactionRemoveAll, async (message) => {
 });
 
 metrics.on(Events.GuildMemberAdd, async (member) => {
-    await logging.userJoin(member,cloneDeep(invites));
+    try {
+        await logging.userJoin(member,cloneDeep(invites));
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 metrics.on(Events.GuildMemberRemove, async (member) => {
-    await logging.userLeave(member);
+    try {
+        await logging.userLeave(member);
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 metrics.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
-    await logging.auditLogs(auditLog);
-    if (auditLog.action == AuditLogEvent.InviteCreate) {
-        invites = await client.guilds.cache.first().invites.fetch();
-    };
+    try {
+        await logging.auditLogs(auditLog);
+        if (auditLog.action == AuditLogEvent.InviteCreate) {
+            invites = await client.guilds.cache.first().invites.fetch();
+        };
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 metrics.listen();
