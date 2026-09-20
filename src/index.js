@@ -8,6 +8,7 @@ const {
 const cloneDeep = require("lodash.clonedeep");
 
 const client = require('./client');
+const metrics = require('./metrics');
 
 const tryRequire = (path) => {
     try {
@@ -182,4 +183,5 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
     };
 });
 
+metrics.listen();
 client.login(token);
