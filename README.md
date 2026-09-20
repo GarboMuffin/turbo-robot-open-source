@@ -34,6 +34,10 @@ Start the bot:
 node src/index
 ```
 
+## Metrics
+
+Set the `METRICS_PORT` environment variable. You can pull that into Prometheus/VictoriaMetrics. It listens on only `127.0.0.1` for security.
+
 ## Security
 
 Send security bugs to security@turbowarp.org instead of the public issue tracker. This bot (both the open source and closed source parts) is **NOT** covered by the usual TurboWarp bug bounty program (You may still get a bounty, but we don't make the same guarantees).
