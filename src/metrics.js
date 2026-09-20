@@ -1,9 +1,5 @@
 const http = require('node:http');
 const promClient = require('@prometheus-io/client');
-const {
-    Events
-} = require('discord.js');
-
 const client = require('./client');
 
 const ready = new promClient.Gauge({
@@ -24,38 +20,34 @@ const ping = new promClient.Gauge({
     }
 });
 
-const events = new promClient.Counter({
-    name: 'turbo_robot_events_total',
-    help: 'Discord events',
+const handlerDuration = new promClient.Histogram({
+    name: 'turbo_robot_handler_duration_seconds',
+    help: 'Event handler duration',
     labelNames: ['event']
 });
 
-const EVENTS = [
-    Events.MessageCreate,
-    Events.MessageUpdate,
-    Events.MessageDelete,
-    Events.VoiceStateUpdate,
-    Events.InteractionCreate,
-    Events.MessageReactionAdd,
-    Events.MessageReactionRemove,
-    Events.MessageReactionRemoveEmoji,
-    Events.MessageReactionRemoveAll,
-    Events.GuildMemberAdd,
-    Events.GuildMemberRemove,
-    Events.GuildAuditLogEntryCreate
-];
-
-for (const event of EVENTS) {
-    // Start at 0 instead of blank.
-    events.inc({
+/**
+ * client.on wrapper that records time.
+ * @template {keyof import('discord.js').ClientEvents} Event
+ * @param {Event} event
+ * @param {(...args: import('discord.js').ClientEvents[Event]) => unknown} handler
+ */
+const on = (event, handler) => {
+    handlerDuration.zero({
         event
-    }, 0);
-    client.on(event, () => {
-        events.inc({
+    });
+
+    client.on(event, async (...args) => {
+        const end = handlerDuration.startTimer({
             event
         });
+        try {
+            await handler(...args);
+        } finally {
+            end();
+        }
     });
-}
+};
 
 const listen = () => {
     if (!process.env.METRICS_PORT) {
@@ -84,5 +76,6 @@ const listen = () => {
 };
 
 module.exports = {
+    on,
     listen
 };

@@ -43,7 +43,7 @@ client.on(Events.ClientReady, async (client) => {
     invites = await client.guilds.cache.first().invites.fetch();
 });
 
-client.on(Events.MessageCreate, async (message) => {
+metrics.on(Events.MessageCreate, async (message) => {
     try {
         if (message.partial) {
             await message.fetch();
@@ -63,7 +63,7 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 
-client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+metrics.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     try {
         if (newMessage.partial) {
             await newMessage.fetch();
@@ -81,7 +81,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     }
 });
 
-client.on(Events.MessageDelete, async (message) => {
+metrics.on(Events.MessageDelete, async (message) => {
     try {
         await logging.deletedMessage(message);
         await starBoard.onDeleteMessage(message);
@@ -90,11 +90,11 @@ client.on(Events.MessageDelete, async (message) => {
     }
 });
 
-client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+metrics.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     await logging.voiceChat(oldState, newState);
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
+metrics.on(Events.InteractionCreate, async (interaction) => {
     try {
         switch (interaction.commandName) {
             case 'contactmods':
@@ -136,7 +136,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-client.on(Events.MessageReactionAdd, async (reaction, user) => {
+metrics.on(Events.MessageReactionAdd, async (reaction, user) => {
     try {
         await starBoard.onReaction(reaction, user);
     } catch (e) {
@@ -144,7 +144,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     }
 });
 
-client.on(Events.MessageReactionRemove, async (reaction, user) => {
+metrics.on(Events.MessageReactionRemove, async (reaction, user) => {
     try {
         await logging.onReactionRemove(reaction, user);
     } catch (e) {
@@ -152,7 +152,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
     }
 });
 
-client.on(Events.MessageReactionRemoveEmoji, async (reaction) => {
+metrics.on(Events.MessageReactionRemoveEmoji, async (reaction) => {
     try {
         await logging.onReactionRemovedByModerator(reaction);
     } catch (e) {
@@ -160,7 +160,7 @@ client.on(Events.MessageReactionRemoveEmoji, async (reaction) => {
     }
 });
 
-client.on(Events.MessageReactionRemoveAll, async (message) => {
+metrics.on(Events.MessageReactionRemoveAll, async (message) => {
     try {
         await logging.onAllReactionsRemovedByModerator(message);
     } catch (e) {
@@ -168,15 +168,15 @@ client.on(Events.MessageReactionRemoveAll, async (message) => {
     }
 });
 
-client.on(Events.GuildMemberAdd, async (member) => {
+metrics.on(Events.GuildMemberAdd, async (member) => {
     await logging.userJoin(member,cloneDeep(invites));
 });
 
-client.on(Events.GuildMemberRemove, async (member) => {
+metrics.on(Events.GuildMemberRemove, async (member) => {
     await logging.userLeave(member);
 });
 
-client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
+metrics.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
     await logging.auditLogs(auditLog);
     if (auditLog.action == AuditLogEvent.InviteCreate) {
         invites = await client.guilds.cache.first().invites.fetch();
